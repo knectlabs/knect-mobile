@@ -336,6 +336,30 @@ Mobile:
 
 MVP complete after Phase 1G.
 
+## Mobile status (2026-10-03)
+
+Phases 1B–1G are implemented in the mobile app (backend 1A–1G is complete;
+admin screens for 1B–1G are still to do):
+
+- **1B** Profile: employment (ID, position, department, office, manager, join
+  date), contact, and account.
+- **1C** Home: today's shift with clock-in/out times; the clock button follows
+  the API windows (not open yet / closed → correction).
+- **1D** Clock flow: location permission and service checks, GPS accuracy and
+  mock warnings, front-camera selfie uploaded to `/files/images`, clock-in/out,
+  result screen, and attendance history.
+- **1E** Leave balances, leave request, request history with cancel, and the
+  approval inbox (approve/reject with comment) for managers and HR.
+- **1F** Overtime and attendance-correction requests (correction times are
+  sent as UTC instants of organization-local wall-clock times).
+- **1G** Notification center with unread badge, mark read, mark all read.
+
+Verified: `flutter analyze`, the existing tests, Home on the Android emulator
+against the live API, and every 1D–1G call replayed against the API with the
+app's payloads. The full on-device clock flow was not completed because the
+emulator became unstable (System UI and keystore crashes). Widget tests for
+these screens are deferred until the end of Phase 1, as agreed.
+
 ---
 
 # Phase 2 — Payroll

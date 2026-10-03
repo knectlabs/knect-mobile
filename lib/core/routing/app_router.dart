@@ -3,14 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/attendance/presentation/attendance_screen.dart';
 import '../../features/auth/application/auth_cubit.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/requests/presentation/requests_screen.dart';
 
 abstract final class AppRoutes {
   static const login = '/login';
   static const home = '/home';
+  static const attendance = '/attendance';
+  static const requests = '/requests';
   static const profile = '/profile';
 }
 
@@ -37,8 +41,7 @@ class AppRouter {
           path: AppRoutes.login,
           builder: (context, state) => const LoginScreen(),
         ),
-        // Employee tabs (08_MOBILE_UX_FLOWS.md). Attendance, Requests, and
-        // Payroll join as their phases ship.
+        // Employee tabs (08_MOBILE_UX_FLOWS.md). Payroll joins in Phase 2.
         StatefulShellRoute.indexedStack(
           builder: (context, state, shell) => _TabShell(shell: shell),
           branches: [
@@ -47,6 +50,22 @@ class AppRouter {
                 GoRoute(
                   path: AppRoutes.home,
                   builder: (context, state) => const HomeScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.attendance,
+                  builder: (context, state) => const AttendanceScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.requests,
+                  builder: (context, state) => const RequestsScreen(),
                 ),
               ],
             ),
@@ -91,6 +110,15 @@ class _TabShell extends StatelessWidget {
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.fingerprint),
+            label: 'Attendance',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.assignment_outlined),
+            selectedIcon: Icon(Icons.assignment),
+            label: 'Requests',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

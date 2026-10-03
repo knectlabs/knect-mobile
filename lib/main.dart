@@ -9,7 +9,13 @@ import 'core/storage/device_identity.dart';
 import 'core/storage/token_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/application/auth_cubit.dart';
+import 'features/approvals/data/approvals_repository.dart';
+import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/data/auth_repository.dart';
+import 'features/employee/data/employee_repository.dart';
+import 'features/notifications/data/notifications_repository.dart';
+import 'features/requests/data/requests_repository.dart';
+import 'features/shell/signed_in_scope.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,6 +83,16 @@ class _KerjancokAppState extends State<KerjancokApp> {
         RepositoryProvider.value(value: widget.config),
         RepositoryProvider.value(value: widget.apiClient),
         RepositoryProvider<AuthRepository>.value(value: widget.authRepository),
+        RepositoryProvider(create: (_) => EmployeeRepository(widget.apiClient)),
+        RepositoryProvider(
+          create: (_) =>
+              AttendanceRepository(widget.apiClient, SecureDeviceIdentity()),
+        ),
+        RepositoryProvider(create: (_) => RequestsRepository(widget.apiClient)),
+        RepositoryProvider(create: (_) => ApprovalsRepository(widget.apiClient)),
+        RepositoryProvider(
+          create: (_) => NotificationsRepository(widget.apiClient),
+        ),
       ],
       child: BlocProvider.value(
         value: widget.authCubit,
@@ -87,8 +103,36 @@ class _KerjancokAppState extends State<KerjancokApp> {
           darkTheme: AppTheme.dark,
           themeMode: ThemeMode.system,
           routerConfig: _appRouter.router,
+          builder: (context, child) => _SessionScope(child: child!),
         ),
       ),
+    );
+  }
+}
+
+/// Wraps every route in [SignedInScope]. Its state is replaced on each new
+/// sign-in and kept through sign-out until the router leaves the signed-in
+/// pages; its cubits are lazy, so nothing loads on the sign-in screen.
+class _SessionScope extends StatefulWidget {
+  const _SessionScope({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_SessionScope> createState() => _SessionScopeState();
+}
+
+class _SessionScopeState extends State<_SessionScope> {
+  int _session = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (previous, current) =>
+          previous.status != AuthStatus.authenticated &&
+          current.status == AuthStatus.authenticated,
+      listener: (context, _) => setState(() => _session++),
+      child: SignedInScope(key: ValueKey(_session), child: widget.child),
     );
   }
 }
