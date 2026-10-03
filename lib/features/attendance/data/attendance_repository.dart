@@ -67,6 +67,7 @@ class AttendanceAnomaly {
 class AttendanceRecord {
   AttendanceRecord.fromJson(Json json)
       : id = json.str('id'),
+        employeeId = json.obj('employee').str('id'),
         date = json.str('date'),
         timezone = json.str('timezone'),
         status = json.str('status'),
@@ -84,6 +85,7 @@ class AttendanceRecord {
         anomalies = json.list('anomalies').map(AttendanceAnomaly.fromJson).toList();
 
   final String id;
+  final String employeeId;
   final String date;
   final String timezone;
   final String status;
@@ -136,6 +138,15 @@ class AttendanceRepository {
         await _api.dio.get(
           '/attendance/me/history',
           queryParameters: {'limit': limit},
+        ),
+      ).map(AttendanceRecord.fromJson).toList();
+
+  /// Attendance on [date] (`YYYY-MM-DD`) visible to the caller; managers see
+  /// their direct reports.
+  Future<List<AttendanceRecord>> team(String date) async => dataList(
+        await _api.dio.get(
+          '/attendance',
+          queryParameters: {'from': date, 'to': date, 'limit': 100},
         ),
       ).map(AttendanceRecord.fromJson).toList();
 

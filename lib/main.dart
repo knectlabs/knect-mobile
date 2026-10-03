@@ -12,6 +12,7 @@ import 'features/auth/application/auth_cubit.dart';
 import 'features/approvals/data/approvals_repository.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/data/auth_repository.dart';
+import 'features/employee/data/directory_repository.dart';
 import 'features/employee/data/employee_repository.dart';
 import 'features/notifications/data/notifications_repository.dart';
 import 'features/requests/data/requests_repository.dart';
@@ -84,6 +85,7 @@ class _KerjancokAppState extends State<KerjancokApp> {
         RepositoryProvider.value(value: widget.apiClient),
         RepositoryProvider<AuthRepository>.value(value: widget.authRepository),
         RepositoryProvider(create: (_) => EmployeeRepository(widget.apiClient)),
+        RepositoryProvider(create: (_) => DirectoryRepository(widget.apiClient)),
         RepositoryProvider(
           create: (_) =>
               AttendanceRepository(widget.apiClient, SecureDeviceIdentity()),

@@ -341,12 +341,16 @@ MVP complete after Phase 1G.
 Phases 1B–1G are implemented in the mobile app (backend 1A–1G is complete;
 admin screens for 1B–1G are still to do):
 
-Navigation (Talenta-inspired, Knect visuals): Home · Attendance · Requests ·
-Inbox · Account. Home has the brand header (company, name, position), an icon
-menu, quick requests, and today's shift. Inbox holds notifications and, for
-managers/HR, Need My Approval. Account has My Info (personal, employment,
-emergency contact) and sign-out. Features without a backend yet (payslip,
-reimbursement, announcements, directory, PIN/biometric) are not shown.
+Navigation (Talenta-inspired, Knect visuals; chosen by the product owner on
+2026-10-04, superseding the Attendance tab in AGENTS.md §20): Home ·
+Employees · Request · Inbox · Account. Home has a greeting, today's shift card
+with Clock In | Clock Out, an app grid (Time Off, Live Attendance, Overtime,
+Correction, Attendance Log, My Requests, Approvals), and My direct reports
+with today's team activity. Employees is the people directory
+(`GET /directory`): on leave today, A–Z list, call/email/WhatsApp. Inbox holds
+notifications and, for managers/HR, Need My Approval. Account has My Info and
+sign-out. Announcements, banners, payslip, reimbursement, shift-schedule
+history, and PIN/biometric are not shown until their backends exist.
 
 - **1B** Profile: employment (ID, position, department, office, manager, join
   date), contact, and account.

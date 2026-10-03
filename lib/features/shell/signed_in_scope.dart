@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/async/async_value.dart';
 import '../../core/time/format.dart';
 import '../attendance/data/attendance_repository.dart';
+import '../employee/data/directory_repository.dart';
 import '../employee/data/employee_repository.dart';
 import '../notifications/data/notifications_repository.dart';
 import '../requests/application/requests_cubit.dart';
@@ -96,6 +97,9 @@ class SignedInScope extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => TodayCubit(context.read<AttendanceRepository>()),
+        ),
+        BlocProvider(
+          create: (context) => DirectoryCubit(context.read<DirectoryRepository>()),
         ),
         BlocProvider(
           create: (context) => RequestsCubit(context.read<RequestsRepository>()),

@@ -16,7 +16,7 @@ import '../../shell/signed_in_scope.dart';
 import '../data/attendance_repository.dart';
 import 'clock_screen.dart';
 
-/// Attendance tab ("Live Attendance"): live clock, today's schedule, clock
+/// Live Attendance (opened from Home): live clock, today's schedule, clock
 /// buttons, and today's log.
 class AttendanceScreen extends StatelessWidget {
   const AttendanceScreen({super.key});
@@ -49,12 +49,26 @@ class AttendanceScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 16),
-                        Text(
-                          'Live Attendance',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 56,
+                              child: Navigator.canPop(context)
+                                  ? const BackButton(color: Colors.white)
+                                  : null,
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Live Attendance',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 56),
+                          ],
                         ),
                         const SizedBox(height: 18),
                         _LiveClock(timezone: timezone),

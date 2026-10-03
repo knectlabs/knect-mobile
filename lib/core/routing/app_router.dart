@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/attendance/presentation/attendance_screen.dart';
 import '../../features/auth/application/auth_cubit.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/employee/presentation/employees_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/inbox/presentation/inbox_screen.dart';
 import '../../features/notifications/data/notifications_repository.dart';
@@ -16,7 +16,7 @@ import '../../features/requests/presentation/requests_screen.dart';
 abstract final class AppRoutes {
   static const login = '/login';
   static const home = '/home';
-  static const attendance = '/attendance';
+  static const employees = '/employees';
   static const requests = '/requests';
   static const inbox = '/inbox';
   static const account = '/account';
@@ -45,14 +45,14 @@ class AppRouter {
           path: AppRoutes.login,
           builder: (context, state) => const LoginScreen(),
         ),
-        // Employee tabs (08_MOBILE_UX_FLOWS.md) plus Inbox; Payroll joins in
-        // Phase 2 through the Home menu.
+        // Tabs follow the Talenta-style layout the product owner chose
+        // (2026-10-04): attendance lives on Home; Payroll joins the Home apps.
         StatefulShellRoute.indexedStack(
           builder: (context, state, shell) => _TabShell(shell: shell),
           branches: [
             for (final (path, screen) in const [
               (AppRoutes.home, HomeScreen()),
-              (AppRoutes.attendance, AttendanceScreen()),
+              (AppRoutes.employees, EmployeesScreen()),
               (AppRoutes.requests, RequestsScreen()),
               (AppRoutes.inbox, InboxScreen()),
               (AppRoutes.account, ProfileScreen()),
@@ -98,13 +98,14 @@ class _TabShell extends StatelessWidget {
             label: 'Home',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.fingerprint),
-            label: 'Attendance',
+            icon: Icon(Icons.people_outline),
+            selectedIcon: Icon(Icons.people),
+            label: 'Employees',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.assignment_outlined),
-            selectedIcon: Icon(Icons.assignment),
-            label: 'Requests',
+            icon: Icon(Icons.add),
+            selectedIcon: Icon(Icons.add_circle),
+            label: 'Request',
           ),
           NavigationDestination(
             key: const Key('nav.inbox'),

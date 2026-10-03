@@ -54,7 +54,7 @@ void main() {
 
     expect(repository.calls, contains('signIn:rina.putri@acme.test'));
     expect(find.text('rina.putri'), findsOneWidget);
-    expect(find.text('PT Acme Indonesia'), findsOneWidget);
+    expect(find.byKey(const Key('home.name')), findsOneWidget);
   });
 
   testWidgets('shows why sign-in failed', (tester) async {
