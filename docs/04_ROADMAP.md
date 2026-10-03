@@ -47,36 +47,60 @@ by default with access-token authentication and basic role guards; see
 live-database tests, CI coverage commands, and enforced coverage floors; see
 `16_TESTING.md`. The public readiness endpoint now verifies API and PostgreSQL
 availability; see `17_HEALTH_ENDPOINT.md`. The backend Phase 0 foundation list
-and its API/database exit criteria are complete. Project Phase 0 remains open
-until all three repositories run locally.
+and its API/database exit criteria are complete.
 
 ### Mobile
 
 - [x] Flutter project
-- routing
-- theme
-- Dio client
-- secure storage
-- environment configuration
-- auth state
+- [x] routing
+- [x] theme
+- [x] Dio client
+- [x] secure storage
+- [x] environment configuration
+- [x] auth state
 
 Mobile progress (2026-10-03): the Flutter application has reproducible Android
-and iOS platform projects, lint configuration, dependency locking, and a widget
-smoke test for its bootstrap screen. The next mobile task is routing.
+and iOS platform projects, lint configuration, dependency locking, and widget
+tests. `go_router` guards routes by session state (signed-out users reach only
+`/login`). A shared Material 3 theme uses the Kerjancok brand green. A Dio
+`ApiClient` attaches the stored access token and maps failures to `ApiFailure`
+using the documented error envelope. Tokens live only in
+`flutter_secure_storage`. `AppConfig` reads `APP_ENV` / `API_BASE_URL` from
+`--dart-define` and requires HTTPS outside development. `AuthCubit` restores
+the session before the first frame. Android release builds declare `INTERNET`;
+only debug builds allow cleartext HTTP to a local API. Login, refresh, and
+logout API calls are Phase 1A; see the mobile `README.md`.
 
 ### Admin
 
-- Next.js project
-- layout shell
-- auth handling
-- API client
-- route protection
-- UI primitives
+- [x] Next.js project
+- [x] layout shell
+- [x] auth handling
+- [x] API client
+- [x] route protection
+- [x] UI primitives
+
+Admin progress (2026-10-03): Next.js 16 (App Router, TypeScript, Tailwind CSS
+v4, shadcn/ui) with Kerjancok design tokens for light and dark themes. The
+layout shell follows the PRD admin navigation, and sections become links when
+their phase ships. Sessions are held server-side in httpOnly cookies, and the
+browser never sees tokens. `src/proxy.ts` performs an optimistic redirect, and
+protected layouts re-check the session on the server. A typed server-side API
+client maps the error envelope to `ApiError`. Configuration is validated at
+startup. Loading, error, empty, and not-found primitives exist. The dashboard
+shows live API/database status from `GET /health`. See the admin
+`docs/ADMIN_FOUNDATION.md`.
 
 Exit criteria:
-- [ ] all three repos run locally
+- [x] all three repos run locally
 - [x] API health endpoint works
 - [x] PostgreSQL connection works
+
+Phase 0 complete (2026-10-03). The API ran against Docker Compose PostgreSQL.
+The admin production build ran against it and rendered live health status. The
+mobile debug APK ran on an Android emulator and routed the signed-out session
+to login. The next task is Phase 1A backend authentication (users, refresh
+tokens, devices, login).
 
 ---
 

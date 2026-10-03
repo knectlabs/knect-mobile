@@ -9,3 +9,8 @@ build
 .DS_Store
 .idea/
 *.iml
+
+# Environment definitions with real deployment URLs
+env/*.json
+!env/development.json
+!env/*.example.json
