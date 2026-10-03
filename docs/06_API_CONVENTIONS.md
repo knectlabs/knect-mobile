@@ -167,18 +167,68 @@ the standard error envelope without database details. The response uses
 
 # 2. Authentication
 
+Implemented in Phase 1A. See `18_AUTH_AND_ORGANIZATION.md` for the session
+model.
+
 ```text
-POST /auth/login
-POST /auth/refresh
-POST /auth/logout
-POST /auth/logout-all
-GET  /auth/me
+POST /auth/login        public, rate limited (IP + email, and IP)
+POST /auth/refresh      public
+POST /auth/logout       public (refresh token proves the session)
+POST /auth/logout-all   bearer
+GET  /auth/me           bearer
 ```
+
+Login request (`device` is optional; mobile sends it):
+
+```json
+{
+  "email": "hr@acme.co.id",
+  "password": "********",
+  "device": { "identifier": "install-uuid", "platform": "ANDROID", "model": "Pixel 8" }
+}
+```
+
+Login and refresh return the same session object:
+
+```json
+{
+  "data": {
+    "tokenType": "Bearer",
+    "accessToken": "eyJ...",
+    "accessTokenExpiresAt": "2026-10-03T01:15:00.000Z",
+    "refreshToken": "opaque-single-use-token",
+    "refreshTokenExpiresAt": "2026-11-02T01:00:00.000Z",
+    "user": {
+      "id": "uuid",
+      "email": "hr@acme.co.id",
+      "role": "HR",
+      "lastLoginAt": "2026-10-03T01:00:00.000Z",
+      "organization": { "id": "uuid", "name": "PT Acme", "code": "ACME", "timezone": "Asia/Jakarta" }
+    }
+  }
+}
+```
+
+`GET /auth/me` returns the `user` object as `data`. Refresh and logout take
+`{ "refreshToken": "..." }`. Logout endpoints return `204`.
+
+Refresh tokens are single-use. Every refresh returns a new refresh token, and
+the client must replace the stored one. Presenting a used token ends the whole
+session. Clients must not refresh concurrently.
+
+| Status | Code                    | When                                               |
+| ------ | ----------------------- | -------------------------------------------------- |
+| 401    | `INVALID_CREDENTIALS`   | unknown email or wrong password (indistinguishable) |
+| 403    | `ACCOUNT_INACTIVE`      | correct password, deactivated user                 |
+| 403    | `ORGANIZATION_INACTIVE` | correct password, deactivated organization         |
+| 401    | `INVALID_REFRESH_TOKEN` | unknown, used, revoked, or expired refresh token   |
+| 401    | `UNAUTHORIZED`          | missing/invalid access token, or user no longer active |
+| 429    | `TOO_MANY_REQUESTS`     | over 10 sign-ins/min for one email from one IP, or 100/min from one IP |
 
 All controller routes require a valid access JWT by default. Only routes marked
 with `@Public()` bypass authentication. Public metadata must be limited to
 routes that intentionally accept anonymous requests, such as login, token
-refresh, and a future health endpoint.
+refresh, logout, and the health endpoint.
 
 The verified request principal contains only:
 
@@ -222,6 +272,9 @@ Use query params:
 
 # 4. Organization
 
+Implemented in Phase 1A. All records are scoped to the caller's organization.
+A record in another organization returns `404`.
+
 ```text
 GET/PATCH /organization
 
@@ -234,6 +287,56 @@ GET/PATCH/DELETE /positions/:id
 GET/POST /offices
 GET/PATCH/DELETE /offices/:id
 ```
+
+| Roles                          | `/organization` | departments, positions, offices |
+| ------------------------------ | --------------- | ------------------------------- |
+| `SUPER_ADMIN`, `COMPANY_ADMIN` | read, update    | read, write                     |
+| `HR`, `MANAGER`                | read            | read                            |
+| `EMPLOYEE`                     | read            | `403`                           |
+
+All list endpoints share these query parameters:
+
+| Parameter  | Notes                                     |
+| ---------- | ----------------------------------------- |
+| `page`     | default 1                                 |
+| `limit`    | default 20, maximum 100                   |
+| `search`   | case-insensitive match on name, code, or office address |
+| `isActive` | `true` or `false`                         |
+
+Additional filters: `parentId` for departments, `departmentId` for positions.
+
+- `:id` must be a UUID (`400` otherwise).
+- `POST` returns `201` with `{ "data": ... }`. `DELETE` returns `204`.
+- Department and position codes are stored uppercase and are unique per
+  organization.
+
+Department and position responses embed their reference:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "name": "Payroll",
+    "code": "PAY",
+    "parent": { "id": "uuid", "name": "Human Resources", "code": "HR" },
+    "isActive": true,
+    "createdAt": "...",
+    "updatedAt": "..."
+  }
+}
+```
+
+Office: `name`, `address`, `latitude`, `longitude` (numbers, up to 7
+decimals), `geofenceRadiusM` (10 to 10,000, default 100), `timezone` (IANA,
+or `null` to inherit), `isActive`.
+
+| Status | Code                                                     | When                                       |
+| ------ | -------------------------------------------------------- | ------------------------------------------ |
+| 404    | `DEPARTMENT_NOT_FOUND`, `POSITION_NOT_FOUND`, `OFFICE_NOT_FOUND` | missing or in another organization |
+| 409    | `DEPARTMENT_CODE_TAKEN`, `POSITION_CODE_TAKEN`           | duplicate code (`details.field = "code"`)  |
+| 400    | `DEPARTMENT_PARENT_INVALID`                              | parent missing, foreign, or would create a cycle |
+| 400    | `POSITION_DEPARTMENT_INVALID`                            | department missing or foreign              |
+| 409    | `DEPARTMENT_IN_USE`, `POSITION_IN_USE`, `OFFICE_IN_USE`  | delete of a referenced record; deactivate instead |
 
 ---
 

@@ -108,32 +108,85 @@ tokens, devices, login).
 
 Backend:
 
-- users
-- refresh tokens
-- devices
-- login
-- refresh
-- logout
-- RBAC
-- organization CRUD
-- department CRUD
-- position CRUD
-- office CRUD
+- [x] users
+- [x] refresh tokens
+- [x] devices
+- [x] login
+- [x] refresh
+- [x] logout
+- [x] RBAC
+- [x] organization CRUD
+- [x] department CRUD
+- [x] position CRUD
+- [x] office CRUD
+
+Backend progress (2026-10-03): the first migration creates `organizations`,
+`users`, `devices`, `refresh_tokens`, `departments`, `positions`, and
+`offices`, with UUID keys and snake_case names.
+
+- **Decisions:** globally unique lowercased email (ADR-013), UUID keys
+  (ADR-014), CLI bootstrap of the first organization and `COMPANY_ADMIN`
+  (ADR-015).
+- **Auth:** login binds the session to a device. Refresh tokens are
+  HMAC-hashed, single-use, and rotated in a transaction; reuse revokes the
+  session. Logout ends one session or all, and `/auth/me` returns the user.
+  Every request re-checks the user and organization in the database.
+- **Organization structure:** organization profile plus department, position,
+  and office CRUD. Each list is tenant-scoped, paginated, and searchable.
+  Writes are restricted by role, department cycles are prevented, and
+  referenced records cannot be deleted.
+- **Tests:** live-PostgreSQL suites cover rotation, reuse, concurrency, RBAC,
+  and cross-tenant isolation.
+
+Deferred, with reasons, in `18_AUTH_AND_ORGANIZATION.md`: forgot/reset
+password, user management endpoints (Phase 1B), and audit logging (Phase 1G).
 
 Admin:
 
-- login
-- organization settings
-- departments
-- positions
-- offices
+- [x] login
+- [x] organization settings
+- [x] departments
+- [x] positions
+- [x] offices
+
+Admin progress (2026-10-03):
+
+- **Sign-in:** a server-action login keeps tokens only in httpOnly cookies.
+  Employee accounts are refused.
+- **Session renewal:** the proxy renews expired access tokens and exchanges
+  each refresh token once per process, so parallel requests do not trigger
+  reuse detection. Revoked sessions return to login with a notice.
+- **Organization:** a profile form plus department, position, and office
+  pages with URL-driven search, status filter, and pagination. Create and
+  edit run in dialogs that map API errors to fields. Deletes are confirmed.
+  HR and managers get read-only views.
+- **Verification:** a browser end-to-end run against the live API passed. See
+  the admin `docs/ADMIN_FOUNDATION.md`.
 
 Mobile:
 
-- login
-- token refresh
-- logout
-- profile placeholder
+- [x] login
+- [x] token refresh
+- [x] logout
+- [x] profile placeholder
+
+Mobile progress (2026-10-03):
+
+- **Sign-in:** a real `POST /auth/login` bound to a secure-storage
+  installation id, with messages per error code.
+- **Token refresh:** a queued Dio interceptor refreshes once per expiry and
+  retries through an interceptor-free client. If the API rejects the refresh,
+  the app returns to sign-in with a session-ended notice.
+- **Session restore and profile:** the stored session is restored offline;
+  the profile from `/auth/me` shows email, role, and organization. The app has
+  Home and Profile tabs, sign-out, and sign-out of all devices.
+- **Verification:** checked on an Android emulator against the live API:
+  wrong password, sign-in, profile, restore after force-stop, and forced
+  session end.
+
+Phase 1A complete (2026-10-03) across all three repositories. Next: Phase 1B
+Employees, starting with the backend employee schema
+(`employees` + `users.employee_id`) and CRUD.
 
 ---
 

@@ -68,6 +68,11 @@ erDiagram
 
 # 3. Core HR
 
+Phase 1A implements `ORGANIZATION`, `USER` (without `employee_id`, which
+arrives with `EMPLOYEE` in Phase 1B), `DEPARTMENT`, `POSITION`, and `OFFICE`.
+IDs are UUIDs (ADR-014). `OFFICE.timezone` is nullable and inherits the
+organization timezone when null.
+
 ```mermaid
 erDiagram
     ORGANIZATION {
@@ -179,10 +184,13 @@ erDiagram
         uuid id PK
         uuid user_id FK
         uuid device_id FK
-        string token_hash
+        uuid family_id
+        string token_hash UK
         datetime expires_at
         datetime revoked_at
-        uuid replaced_by_id
+        uuid replaced_by_id UK
+        string ip_address
+        string user_agent
         datetime created_at
     }
 
@@ -203,6 +211,14 @@ erDiagram
     USER ||--o{ DEVICE : registers
     DEVICE ||--o{ REFRESH_TOKEN : sessions
 ```
+
+Implementation notes (Phase 1A, see `18_AUTH_AND_ORGANIZATION.md`):
+
+- `family_id` groups the tokens of one session. Reuse of a consumed token
+  revokes the family.
+- `token_hash` is an HMAC-SHA256 of the opaque token. Raw tokens are never
+  stored.
+- `DEVICE` is unique per `(user_id, device_identifier)`.
 
 ---
 
@@ -764,9 +780,7 @@ INDEX(organization_id, status)
 # 16. Important Data Integrity Rules
 
 1. Employee code is unique per organization.
-2. User email uniqueness strategy must be explicitly chosen:
-   - globally unique, or
-   - unique within organization.
+2. User email is globally unique and stored lowercased (ADR-013).
 3. Attendance cannot belong to another organization's employee.
 4. Leave request and leave type must belong to the same organization.
 5. Approver must belong to the correct organization.

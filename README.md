@@ -62,8 +62,45 @@ an unexpected API.
 - `AuthCubit` restores the session before the first frame. The `go_router`
   redirect sends unauthenticated users to `/login` and authenticated users away
   from it.
-- Login, token refresh, and logout API calls are Phase 1A. Until then the login
-  screen is an informational placeholder and no fake credentials exist.
+
+## Authentication (Phase 1A)
+
+| Concern            | Location                                              |
+| ------------------ | ----------------------------------------------------- |
+| API calls          | `lib/features/auth/data/auth_repository.dart`         |
+| Contract models    | `lib/features/auth/domain/auth_models.dart`           |
+| Session state      | `lib/features/auth/application/auth_cubit.dart`       |
+| Sign-in form state | `lib/features/auth/application/login_cubit.dart`      |
+| Device identity    | `lib/core/storage/device_identity.dart`               |
+| Token refresh      | `_SessionRefreshInterceptor` in `api_client.dart`     |
+
+- **Sign-in:** `POST /auth/login` with email, password, and the device. The
+  device is a random installation UUID kept in secure storage, sent with
+  platform `ANDROID`/`IOS`.
+- **Errors:** the API error code is mapped to a message, for example wrong
+  credentials, deactivated account, rate limit, or offline.
+- **Refresh:** a 401 on any request triggers one `POST /auth/refresh`, then
+  the request is retried.
+  - 401 responses are queued, so concurrent failures share one refresh. This
+    matters because refresh tokens are single-use and reuse ends the session.
+  - The refresh and the retry use an interceptor-free client, so a failing
+    retry cannot deadlock the queue.
+- **Session expiry:** if the API rejects the refresh token, stored tokens are
+  cleared and `ApiClient.sessionExpired` fires. The app then returns to sign-in
+  with "Your session has ended".
+- **Restore:** the app opens straight to Home when tokens are stored, even
+  offline, and loads `/auth/me` in the background.
+- **Sign-out:** sign out of this device (`/auth/logout`, best effort), or sign
+  out of all devices (`/auth/logout-all`). Signing out of all devices fails
+  visibly when offline.
+- **Navigation:** the tabs are Home and Profile. Attendance, Requests, and
+  Payroll join as their phases ship.
+- **Not yet:** forgot or reset password (needs email delivery on the API).
+  The login screen points users to HR.
+
+Revoking sessions on the server (logout-all) takes effect at the next token
+refresh, up to the access-token lifetime (15 minutes by default).
+Deactivating an account takes effect on the next request.
 
 ## Checks
 
