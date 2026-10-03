@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/async/async_value.dart';
+import '../../core/time/format.dart';
 import '../attendance/data/attendance_repository.dart';
 import '../employee/data/employee_repository.dart';
 import '../notifications/data/notifications_repository.dart';
@@ -29,6 +30,34 @@ class TodayStatus {
     if (opens != null && now.isBefore(opens)) return WindowState.notOpen;
     if (closes != null && now.isAfter(closes)) return WindowState.closed;
     return WindowState.open;
+  }
+
+  /// The clock action available at [now] (null when none) and its label.
+  ({ClockAction? action, String label}) next(DateTime now) {
+    final tz = schedule.timezone;
+    final pending = needsClockOut
+        ? ClockAction.clockOut
+        : needsClockIn
+            ? ClockAction.clockIn
+            : null;
+    final state = window(now);
+    // Clock-out before its window is allowed (recorded as early leave);
+    // after either window closes the API only accepts a correction.
+    final blocked = state == WindowState.closed ||
+        (pending == ClockAction.clockIn && state == WindowState.notOpen);
+    final action = blocked ? null : pending;
+    final label = switch (action) {
+      ClockAction.clockIn => 'Clock in',
+      ClockAction.clockOut => 'Clock out',
+      null when pending == ClockAction.clockIn && state == WindowState.notOpen =>
+        'Clock-in opens at ${Clock.hm(schedule.clockInOpensAt!, tz)}',
+      null when pending == ClockAction.clockIn =>
+        'Clock-in closed · request a correction',
+      null when pending == ClockAction.clockOut =>
+        'Clock-out closed · request a correction',
+      null => done ? 'Done for today' : 'Nothing to record',
+    };
+    return (action: action, label: label);
   }
 }
 

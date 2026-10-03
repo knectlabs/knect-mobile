@@ -169,30 +169,7 @@ class _ClockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tz = today.schedule.timezone;
-    final pending = today.needsClockOut
-        ? ClockAction.clockOut
-        : today.needsClockIn
-            ? ClockAction.clockIn
-            : null;
-    final window = today.window(DateTime.now());
-    // Clock-out before its window is allowed (recorded as early leave);
-    // after either window closes the API only accepts a correction.
-    final blocked = window == WindowState.closed ||
-        (pending == ClockAction.clockIn && window == WindowState.notOpen);
-    final action = blocked ? null : pending;
-    final opensAt = pending == ClockAction.clockOut
-        ? today.schedule.clockOutOpensAt
-        : today.schedule.clockInOpensAt;
-    final label = switch (action) {
-      ClockAction.clockIn => 'Clock in',
-      ClockAction.clockOut => 'Clock out',
-      null when pending == ClockAction.clockIn && window == WindowState.notOpen =>
-        'Clock-in opens at ${Clock.hm(opensAt!, tz)}',
-      null when pending == ClockAction.clockIn => 'Clock-in closed · request a correction',
-      null when pending == ClockAction.clockOut => 'Clock-out closed · request a correction',
-      null => today.done ? 'Done for today' : 'Nothing to record',
-    };
+    final (:action, :label) = today.next(DateTime.now());
     final style = FilledButton.styleFrom(
       backgroundColor: Colors.white,
       foregroundColor: BrandColors.deepViolet,

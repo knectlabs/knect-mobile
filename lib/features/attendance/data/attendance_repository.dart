@@ -18,7 +18,10 @@ class TodaySchedule {
         clockInOpensAt = json.timeOrNull('clockInOpensAt'),
         clockInClosesAt = json.timeOrNull('clockInClosesAt'),
         clockOutOpensAt = json.timeOrNull('clockOutOpensAt'),
-        clockOutClosesAt = json.timeOrNull('clockOutClosesAt');
+        clockOutClosesAt = json.timeOrNull('clockOutClosesAt'),
+        office = json['office'] is Map
+            ? AttendanceOffice.fromJson(json.obj('office'))
+            : null;
 
   final String date;
   final String timezone;
@@ -32,6 +35,22 @@ class TodaySchedule {
   final DateTime? clockInClosesAt;
   final DateTime? clockOutOpensAt;
   final DateTime? clockOutClosesAt;
+
+  /// Office whose geofence applies; previewed on the map, decided by the API.
+  final AttendanceOffice? office;
+}
+
+class AttendanceOffice {
+  AttendanceOffice.fromJson(Json json)
+      : name = json.str('name'),
+        latitude = (json['latitude'] as num).toDouble(),
+        longitude = (json['longitude'] as num).toDouble(),
+        radiusMeters = (json['radiusMeters'] as num).toDouble();
+
+  final String name;
+  final double latitude;
+  final double longitude;
+  final double radiusMeters;
 }
 
 class AttendanceAnomaly {
