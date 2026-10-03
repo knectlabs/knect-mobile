@@ -92,6 +92,20 @@ void main() {
       await auth.close();
     });
 
+    test('clears the error when the user edits the form', () async {
+      final repository = FakeAuthRepository();
+      final auth = AuthCubit(repository);
+      final login = LoginCubit(repository, auth);
+
+      await login.submit(email: '', password: '');
+      expect(login.state.error, isNotNull);
+      login.clearError();
+
+      expect(login.state, const LoginState());
+      await login.close();
+      await auth.close();
+    });
+
     test('requires both fields', () async {
       final repository = FakeAuthRepository();
       final auth = AuthCubit(repository);

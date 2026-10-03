@@ -24,6 +24,11 @@ class LoginCubit extends Cubit<LoginState> {
   final AuthRepository _repository;
   final AuthCubit _auth;
 
+  /// Dismisses the last error once the user edits the form.
+  void clearError() {
+    if (state.error != null && !state.submitting) emit(const LoginState());
+  }
+
   Future<void> submit({required String email, required String password}) async {
     if (state.submitting) return;
     if (email.trim().isEmpty || password.isEmpty) {

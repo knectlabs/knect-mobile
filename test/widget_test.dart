@@ -37,7 +37,7 @@ void main() {
   testWidgets('routes signed-out users to sign in', (tester) async {
     await pumpApp(tester);
 
-    expect(find.text('Sign in to Kerjancok'), findsOneWidget);
+    expect(find.text('Sign in to your account'), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
   });
 
@@ -75,7 +75,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('has been deactivated'), findsOneWidget);
-    expect(find.text('Sign in to Kerjancok'), findsOneWidget);
+    expect(find.text('Sign in to your account'), findsOneWidget);
   });
 
   testWidgets('restores a session and signs out from profile', (tester) async {
@@ -91,7 +91,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.calls, contains('signOut'));
-    expect(find.text('Sign in to Kerjancok'), findsOneWidget);
+    expect(find.text('Sign in to your account'), findsOneWidget);
   });
 
   testWidgets('returns to sign in with a notice when the session ends', (
@@ -102,7 +102,7 @@ void main() {
     repository.expireSession();
     await tester.pumpAndSettle();
 
-    expect(find.text('Sign in to Kerjancok'), findsOneWidget);
+    expect(find.text('Sign in to your account'), findsOneWidget);
     expect(find.textContaining('Your session has ended'), findsOneWidget);
   });
 }
