@@ -14,33 +14,49 @@ class _InboxCubit extends LoadCubit<List<Approval>> {
       : super(() => repository.inbox(pending: pending));
 }
 
-/// Approval inbox for managers and HR: pending decisions and history.
+/// Approval history for managers and HR: pending decisions and decided ones.
 class ApprovalsScreen extends StatelessWidget {
   const ApprovalsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final repository = context.read<ApprovalsRepository>();
-    return DefaultTabController(
+    return const DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Approvals'),
-          bottom: const TabBar(tabs: [Tab(text: 'Pending'), Tab(text: 'Decided')]),
-        ),
+        appBar: _ApprovalsAppBar(),
         body: TabBarView(
-          children: [
-            BlocProvider(
-              create: (_) => _InboxCubit(repository, pending: true),
-              child: const _Inbox(pending: true),
-            ),
-            BlocProvider(
-              create: (_) => _InboxCubit(repository, pending: false),
-              child: const _Inbox(pending: false),
-            ),
-          ],
+          children: [ApprovalList(pending: true), ApprovalList(pending: false)],
         ),
       ),
+    );
+  }
+}
+
+class _ApprovalsAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _ApprovalsAppBar();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + kTextTabBarHeight);
+
+  @override
+  Widget build(BuildContext context) => AppBar(
+        title: const Text('Approvals'),
+        bottom: const TabBar(tabs: [Tab(text: 'Pending'), Tab(text: 'Decided')]),
+      );
+}
+
+/// Approvals assigned to the signed-in user (pending or decided).
+class ApprovalList extends StatelessWidget {
+  const ApprovalList({required this.pending, super.key});
+
+  final bool pending;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          _InboxCubit(context.read<ApprovalsRepository>(), pending: pending),
+      child: _Inbox(pending: pending),
     );
   }
 }
@@ -74,32 +90,15 @@ class _Inbox extends StatelessWidget {
                 ],
               )
             : ListView.separated(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: approvals.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final approval = approvals[index];
-                  return Card(
-                    margin: EdgeInsets.zero,
-                    clipBehavior: Clip.antiAlias,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      title: Text(approval.requesterName),
-                      subtitle: Text(
-                        [
-                          '${approval.typeLabel} · ${approval.title ?? ''}',
-                          if (approval.subtitle != null) approval.subtitle!,
-                          Clock.date(Clock.toZone(approval.createdAt, tz)),
-                        ].join('\n'),
-                      ),
-                      isThreeLine: true,
-                      trailing: pending
-                          ? const Icon(Icons.chevron_right)
-                          : StatusChip.approval(approval.status),
-                      onTap: pending ? () => _decide(context, approval) : null,
-                    ),
-                  );
-                },
+                separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
+                itemBuilder: (context, index) => _ApprovalTile(
+                  approval: approvals[index],
+                  timezone: tz,
+                  trailing: pending ? null : StatusChip.approval(approvals[index].status),
+                  onTap: pending ? () => _decide(context, approvals[index]) : null,
+                ),
               ),
       ),
     );
@@ -260,6 +259,64 @@ class _DecisionSheetState extends State<_DecisionSheet> {
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ApprovalTile extends StatelessWidget {
+  const _ApprovalTile({
+    required this.approval,
+    required this.timezone,
+    this.trailing,
+    this.onTap,
+  });
+
+  final Approval approval;
+  final String? timezone;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final (icon, color) = switch (approval.targetType) {
+      'LEAVE_REQUEST' => (Icons.beach_access, const Color(0xFF2563EB)),
+      'OVERTIME_REQUEST' => (Icons.more_time, const Color(0xFFEA580C)),
+      _ => (Icons.edit_calendar, const Color(0xFF0D9488)),
+    };
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(width: 26),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(approval.requesterName, style: theme.textTheme.titleSmall),
+                  Text(
+                    [approval.title ?? approval.typeLabel, if (approval.subtitle != null) approval.subtitle!]
+                        .join(' · '),
+                    style: muted,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${approval.typeLabel} · ${Clock.date(Clock.toZone(approval.createdAt, timezone))}',
+                    style: muted,
+                  ),
+                ],
+              ),
+            ),
+            trailing ?? Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
       ),

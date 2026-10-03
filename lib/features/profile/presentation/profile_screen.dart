@@ -8,8 +8,11 @@ import '../../auth/application/auth_cubit.dart';
 import '../../auth/domain/auth_models.dart';
 import '../../employee/data/employee_repository.dart';
 import '../../shell/signed_in_scope.dart';
+import '../../../shared/widgets/initials_avatar.dart';
+import '../../../shared/widgets/large_title.dart';
+import '../../../shared/widgets/navigation.dart';
 
-/// Employee profile (employment and contact), account, and sign-out.
+/// Account tab: who the user is, their employee info, and sign-out.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -65,114 +68,210 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final user = context.select((AuthCubit cubit) => cubit.state.user);
     final profileState = context.watch<ProfileCubit>().state;
     final profile = profileState.valueOrPrevious;
 
+    void open(String title, List<_Row> rows) =>
+        pushPage(context, _InfoPage(title: title, rows: rows));
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: RefreshIndicator(
-        onRefresh: () => Future.wait([
-          context.read<AuthCubit>().refreshProfile(),
-          context.read<ProfileCubit>().load(),
-        ]),
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-          children: [
-            if (profile != null) ...[
-              _ProfileHeader(profile: profile),
-              const SizedBox(height: 20),
-              _Section(title: 'Employment', rows: [
-                (Icons.badge_outlined, 'Employee ID', profile.code),
-                (Icons.work_outline, 'Position', profile.position?.name),
-                (Icons.groups_outlined, 'Department', profile.department?.name),
-                (Icons.place_outlined, 'Office', profile.office?.name),
-                (Icons.supervisor_account_outlined, 'Manager', profile.manager?.name),
-                (Icons.event_outlined, 'Joined', Clock.date(profile.joinDate)),
-              ]),
-              const SizedBox(height: 16),
-              _Section(title: 'Contact', rows: [
-                (Icons.phone_outlined, 'Phone', profile.phone),
-                (
-                  Icons.contact_emergency_outlined,
-                  'Emergency contact',
-                  profile.emergencyContactName == null
-                      ? null
-                      : [profile.emergencyContactName, profile.emergencyContactPhone]
-                          .whereType<String>()
-                          .join(' · '),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () => Future.wait([
+            context.read<AuthCubit>().refreshProfile(),
+            context.read<ProfileCubit>().load(),
+          ]),
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 32),
+            children: [
+              const LargeTitle('Account'),
+              if (user == null && profile == null)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: _ProfileUnavailable(),
+                )
+              else
+                _AccountHeader(user: user, profile: profile),
+              if (profile == null &&
+                  user != null &&
+                  profileState is AsyncError<EmployeeProfile?>)
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+                  child: _ProfileUnavailable(),
                 ),
-              ]),
-              const SizedBox(height: 16),
-            ] else if (profileState is AsyncError<EmployeeProfile?>) ...[
-              const _ProfileUnavailable(),
-              const SizedBox(height: 16),
+              if (profile != null) ...[
+                const _SectionTitle('My Info'),
+                _MenuTile(
+                  icon: Icons.account_circle,
+                  color: const Color(0xFF2563EB),
+                  label: 'Personal Info',
+                  onTap: () => open('Personal Info', [
+                    (Icons.person_outline, 'Full name', profile.fullName),
+                    (Icons.badge_outlined, 'Employee ID', profile.code),
+                    (Icons.mail_outline, 'Email', profile.email ?? user?.email),
+                    (Icons.phone_outlined, 'Phone', profile.phone),
+                  ]),
+                ),
+                _MenuTile(
+                  icon: Icons.work,
+                  color: const Color(0xFF7C3AED),
+                  label: 'Employment Info',
+                  onTap: () => open('Employment Info', [
+                    (Icons.work_outline, 'Position', profile.position?.name),
+                    (Icons.groups_outlined, 'Department', profile.department?.name),
+                    (Icons.place_outlined, 'Office', profile.office?.name),
+                    (
+                      Icons.supervisor_account_outlined,
+                      'Manager',
+                      profile.manager?.name
+                    ),
+                    (Icons.event_outlined, 'Join date', Clock.date(profile.joinDate)),
+                    (Icons.verified_outlined, 'Status', _status(profile.status)),
+                  ]),
+                ),
+                _MenuTile(
+                  icon: Icons.emergency,
+                  color: const Color(0xFFDC2626),
+                  label: 'Emergency Contact Info',
+                  onTap: () => open('Emergency Contact Info', [
+                    (Icons.person_outline, 'Name', profile.emergencyContactName),
+                    (Icons.phone_outlined, 'Phone', profile.emergencyContactPhone),
+                  ]),
+                ),
+              ],
+              const _SectionTitle('Settings'),
+              _MenuTile(
+                key: const Key('profile.signOut'),
+                icon: Icons.logout,
+                color: const Color(0xFFEA580C),
+                label: 'Sign out',
+                showChevron: false,
+                onTap: _busy ? null : () => _signOut(everywhere: false),
+              ),
+              _MenuTile(
+                icon: Icons.devices,
+                color: const Color(0xFF64748B),
+                label: 'Sign out of all devices',
+                showChevron: false,
+                onTap: _busy ? null : () => _signOut(everywhere: true),
+              ),
+              if (user != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                  child: Text(
+                    'Signed in as ${user.email} · ${user.role.label}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
             ],
-            if (user == null)
-              const _ProfileUnavailable()
-            else
-              _AccountCard(user: user),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              key: const Key('profile.signOut'),
-              onPressed: _busy ? null : () => _signOut(everywhere: false),
-              icon: const Icon(Icons.logout),
-              label: const Text('Sign out'),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: _busy ? null : () => _signOut(everywhere: true),
-              child: const Text('Sign out of all devices'),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.profile});
+String _status(String status) => switch (status) {
+      'ACTIVE' => 'Active',
+      'PROBATION' => 'Probation',
+      'RESIGNED' => 'Resigned',
+      'TERMINATED' => 'Terminated',
+      final other => other,
+    };
 
-  final EmployeeProfile profile;
+class _AccountHeader extends StatelessWidget {
+  const _AccountHeader({required this.user, required this.profile});
+
+  final CurrentUser? user;
+  final EmployeeProfile? profile;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final initials = profile.fullName
-        .split(' ')
-        .where((part) => part.isNotEmpty)
-        .take(2)
-        .map((part) => part[0].toUpperCase())
-        .join();
-    final role = [profile.position?.name, profile.department?.name]
+    final muted = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final name = profile?.fullName ?? user?.email ?? '';
+    final role = [profile?.position?.name, profile?.department?.name]
         .whereType<String>()
         .join(' · ');
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(role.isEmpty ? (user?.role.label ?? '') : role, style: muted),
+                if (user != null) Text(user!.organization.name, style: muted),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          InitialsAvatar(name: name, radius: 30),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
+        child: Text(
+          title,
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+      );
+}
+
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.onTap,
+    this.showChevron = true,
+    super.key,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String label;
+  final VoidCallback? onTap;
+  final bool showChevron;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: theme.colorScheme.primaryContainer,
-          child: Text(
-            initials,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          leading: Icon(icon, color: color),
+          title: Text(label),
+          trailing: showChevron ? const Icon(Icons.chevron_right) : null,
+          onTap: onTap,
         ),
-        const SizedBox(height: 12),
-        Text(
-          profile.fullName,
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        if (role.isNotEmpty)
-          Text(
-            role,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
+        const Divider(height: 1, indent: 72),
       ],
     );
   }
@@ -180,8 +279,8 @@ class _ProfileHeader extends StatelessWidget {
 
 typedef _Row = (IconData icon, String label, String? value);
 
-class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.rows});
+class _InfoPage extends StatelessWidget {
+  const _InfoPage({required this.title, required this.rows});
 
   final String title;
   final List<_Row> rows;
@@ -189,73 +288,31 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(title, style: theme.textTheme.titleSmall),
-        ),
-        Card(
-          margin: EdgeInsets.zero,
-          child: Column(
-            children: [
-              for (final (index, (icon, label, value)) in rows.indexed) ...[
-                if (index > 0) const Divider(height: 1, indent: 56),
-                ListTile(
-                  leading: Icon(icon),
-                  title: Text(
-                    label,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  subtitle: Text(
-                    value ?? 'Not set',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: value == null ? theme.colorScheme.onSurfaceVariant : null,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AccountCard extends StatelessWidget {
-  const _AccountCard({required this.user});
-
-  final CurrentUser user;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                user.email.substring(0, 1).toUpperCase(),
-                style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: ListView.separated(
+        itemCount: rows.length,
+        separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
+        itemBuilder: (context, index) {
+          final (icon, label, value) = rows[index];
+          return ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            leading: Icon(icon),
+            title: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            title: Text(user.email),
-            subtitle: Text(user.role.label),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.apartment_outlined),
-            title: Text(user.organization.name),
-            subtitle: Text(user.organization.timezone),
-          ),
-        ],
+            subtitle: Text(
+              value ?? 'Not set',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: value == null ? theme.colorScheme.onSurfaceVariant : null,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

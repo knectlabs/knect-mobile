@@ -53,7 +53,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.calls, contains('signIn:rina.putri@acme.test'));
-    expect(find.text('Hello, rina.putri'), findsOneWidget);
+    expect(find.text('rina.putri'), findsOneWidget);
     expect(find.text('PT Acme Indonesia'), findsOneWidget);
   });
 
@@ -80,9 +80,9 @@ void main() {
 
   testWidgets('restores a session and signs out from profile', (tester) async {
     final repository = await pumpApp(tester, stored: true);
-    expect(find.text('Hello, rina.putri'), findsOneWidget);
+    expect(find.text('rina.putri'), findsOneWidget);
 
-    await tester.tap(find.text('Profile'));
+    await tester.tap(find.text('Account'));
     await tester.pumpAndSettle();
     expect(find.text('rina.putri@acme.test'), findsOneWidget);
     expect(find.text('Employee'), findsOneWidget);

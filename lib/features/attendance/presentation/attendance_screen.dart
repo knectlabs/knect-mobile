@@ -288,71 +288,93 @@ class _TodayLog extends StatelessWidget {
       );
     }
     final tz = record.timezone;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Column(
-          children: [
-            _LogTile(
-              icon: Icons.login_rounded,
-              title: 'Clock in',
-              time: Clock.hm(record.clockInAt!, tz),
-              detail: [
-                if (record.lateMinutes > 0) 'Late ${Clock.duration(record.lateMinutes)}',
-                if (record.clockInDistanceM != null)
-                  '${formatDistance(record.clockInDistanceM!)} from office',
-              ].join(' · '),
-            ),
-            if (record.clockOutAt != null) ...[
-              const Divider(height: 1, indent: 56),
-              _LogTile(
-                icon: Icons.logout_rounded,
-                title: 'Clock out',
-                time: Clock.hm(record.clockOutAt!, tz),
-                detail: [
-                  if (record.workMinutes != null)
-                    '${Clock.duration(record.workMinutes!)} worked',
-                  if (record.clockOutLocationValid == false) 'Outside office area',
-                ].join(' · '),
-              ),
-            ],
-          ],
+    // Newest first.
+    final rows = [
+      if (record.clockOutAt != null)
+        _LogRow(
+          time: Clock.hm(record.clockOutAt!, tz),
+          event: 'Clock Out',
+          detail: [
+            if (record.workMinutes != null)
+              '${Clock.duration(record.workMinutes!)} worked',
+            if (record.earlyLeaveMinutes > 0)
+              'Left ${Clock.duration(record.earlyLeaveMinutes)} early',
+            if (record.clockOutLocationValid == false) 'Outside office area',
+          ].join(' · '),
+          flagged: record.earlyLeaveMinutes > 0 ||
+              record.clockOutLocationValid == false,
         ),
+      _LogRow(
+        time: Clock.hm(record.clockInAt!, tz),
+        event: 'Clock In',
+        detail: [
+          if (record.lateMinutes > 0) 'Late ${Clock.duration(record.lateMinutes)}',
+          if (record.clockInDistanceM != null)
+            '${formatDistance(record.clockInDistanceM!)} from office',
+        ].join(' · '),
+        flagged: record.lateMinutes > 0,
       ),
+    ];
+    return Column(
+      children: [
+        for (final row in rows) ...[
+          row,
+          const Divider(height: 1, indent: 20, endIndent: 20),
+        ],
+      ],
     );
   }
 }
 
-class _LogTile extends StatelessWidget {
-  const _LogTile({
-    required this.icon,
-    required this.title,
+class _LogRow extends StatelessWidget {
+  const _LogRow({
     required this.time,
+    required this.event,
     required this.detail,
+    this.flagged = false,
   });
 
-  final IconData icon;
-  final String title;
   final String time;
+  final String event;
   final String detail;
+
+  /// Late, early leave, or outside the area: the time is shown in red.
+  final bool flagged;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: theme.colorScheme.primaryContainer,
-        child: Icon(icon, size: 20, color: theme.colorScheme.onPrimaryContainer),
-      ),
-      title: Text(title),
-      subtitle: detail.isEmpty ? null : Text(detail),
-      trailing: Text(
-        time,
-        style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          fontFeatures: const [ui.FontFeature.tabularFigures()],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 92,
+            child: Text(
+              time,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: flagged ? theme.colorScheme.error : null,
+                fontFeatures: const [ui.FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(event, style: theme.textTheme.titleMedium),
+                if (detail.isNotEmpty)
+                  Text(
+                    detail,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

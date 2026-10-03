@@ -8,71 +8,78 @@ import '../../auth/application/auth_cubit.dart';
 import '../data/notifications_repository.dart';
 
 class _NotificationsCubit extends LoadCubit<List<AppNotification>> {
-  _NotificationsCubit(this._repository) : super(_repository.list);
+  _NotificationsCubit(this._repository, this._unread) : super(_repository.list);
 
   final NotificationsRepository _repository;
+  final UnreadCountCubit _unread;
 
   Future<void> markRead(AppNotification notification) async {
     if (!notification.unread) return;
     try {
       await _repository.markRead(notification.id);
     } catch (_) {}
-    await load();
+    await Future.wait([load(), _unread.refresh()]);
   }
 
   Future<void> markAllRead() async {
     try {
       await _repository.markAllRead();
     } catch (_) {}
-    await load();
+    await Future.wait([load(), _unread.refresh()]);
   }
 }
 
-/// Notification center: approval outcomes and requests awaiting a decision.
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+/// Notification list (Inbox tab): approval outcomes and requests awaiting a
+/// decision.
+class NotificationsList extends StatelessWidget {
+  const NotificationsList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => _NotificationsCubit(context.read<NotificationsRepository>()),
+      create: (context) => _NotificationsCubit(
+        context.read<NotificationsRepository>(),
+        context.read<UnreadCountCubit>(),
+      ),
       child: Builder(
         builder: (context) {
           final cubit = context.watch<_NotificationsCubit>();
-          final items = cubit.state.valueOrPrevious ?? const [];
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Notifications'),
-              actions: [
-                if (items.any((item) => item.unread))
-                  TextButton(
-                    onPressed: cubit.markAllRead,
-                    child: const Text('Mark all read'),
-                  ),
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: cubit.load,
-              child: AsyncView(
-                value: cubit.state,
-                onRetry: cubit.load,
-                builder: (notifications) => notifications.isEmpty
-                    ? ListView(
-                        children: const [
-                          EmptyView(
-                            icon: Icons.notifications_none,
-                            title: 'No notifications',
-                            message: 'Updates on your requests and approvals appear here.',
-                          ),
-                        ],
-                      )
-                    : ListView.separated(
-                        itemCount: notifications.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (context, index) =>
-                            _NotificationTile(notification: notifications[index]),
-                      ),
-              ),
+          return RefreshIndicator(
+            onRefresh: cubit.load,
+            child: AsyncView(
+              value: cubit.state,
+              onRetry: cubit.load,
+              builder: (notifications) => notifications.isEmpty
+                  ? ListView(
+                      children: const [
+                        EmptyView(
+                          icon: Icons.notifications_none,
+                          title: 'No notifications',
+                          message: 'Updates on your requests and approvals appear here.',
+                        ),
+                      ],
+                    )
+                  : ListView.separated(
+                      itemCount: notifications.length + 1,
+                      separatorBuilder: (_, index) =>
+                          index == 0 ? const SizedBox.shrink() : const Divider(height: 1, indent: 72),
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          final unread = notifications.any((item) => item.unread);
+                          return Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: TextButton(
+                                onPressed: unread ? cubit.markAllRead : null,
+                                child: const Text('Mark all read'),
+                              ),
+                            ),
+                          );
+                        }
+                        return _NotificationTile(notification: notifications[index - 1]);
+                      },
+                    ),
             ),
           );
         },
@@ -93,37 +100,59 @@ class _NotificationTile extends StatelessWidget {
     final tz = context.select(
       (AuthCubit auth) => auth.state.user?.organization.timezone,
     );
-    final local = Clock.toZone(notification.createdAt, tz);
     final unread = notification.unread;
-    final icon = switch (notification.type) {
-      final type when type.contains('APPROVED') => Icons.check_circle_outline,
-      final type when type.contains('REJECTED') => Icons.cancel_outlined,
-      final type when type.contains('APPROVAL') => Icons.fact_check_outlined,
-      _ => Icons.notifications_outlined,
-    };
-    return Material(
-      color: unread ? colors.primaryContainer.withValues(alpha: 0.25) : Colors.transparent,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-        leading: CircleAvatar(
-          backgroundColor: colors.primaryContainer,
-          child: Icon(icon, color: colors.onPrimaryContainer, size: 20),
+    final type = notification.type;
+    final (icon, color) = type.contains('APPROVED')
+        ? (Icons.check_circle, const Color(0xFF16A34A))
+        : type.contains('REJECTED')
+            ? (Icons.cancel, colors.error)
+            : type.contains('APPROVAL')
+                ? (Icons.pending_actions, const Color(0xFFF59E0B))
+                : (Icons.notifications, colors.primary);
+    return InkWell(
+      onTap: () => context.read<_NotificationsCubit>().markRead(notification),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(width: 26),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: unread ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                  if (notification.message.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        notification.message,
+                        style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                      ),
+                    ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${Clock.shortDate(Clock.toZone(notification.createdAt, tz))} · '
+                    '${Clock.hm(notification.createdAt, tz)}',
+                    style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            if (unread)
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 8),
+                child: CircleAvatar(radius: 4, backgroundColor: colors.primary),
+              ),
+            Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+          ],
         ),
-        title: Text(
-          notification.title,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: unread ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-        subtitle: Text(
-          '${notification.message}\n'
-          '${Clock.shortDate(local)} · ${Clock.hm(notification.createdAt, tz)}',
-        ),
-        isThreeLine: true,
-        trailing: unread
-            ? CircleAvatar(radius: 4, backgroundColor: colors.primary)
-            : null,
-        onTap: () => context.read<_NotificationsCubit>().markRead(notification),
       ),
     );
   }
