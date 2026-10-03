@@ -25,3 +25,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/brand/knect_icon.png
+    - assets/brand/knect_wordmark.png

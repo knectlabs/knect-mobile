@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/theme/app_theme.dart';
+import '../../../core/brand/brand.dart';
 import '../application/auth_cubit.dart';
 import '../application/login_cubit.dart';
 import '../data/auth_repository.dart';
@@ -53,9 +53,6 @@ class _LoginViewState extends State<_LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final brand = AppTheme.brandFor(brightness);
-
     // The brand band paints edge to edge behind the status bar.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -67,8 +64,10 @@ class _LoginViewState extends State<_LoginView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ColoredBox(
-                color: brand,
+              DecoratedBox(
+                decoration: const BoxDecoration(
+                  gradient: BrandColors.brandGradient,
+                ),
                 child: _BrandBand(
                   screenHeight: MediaQuery.sizeOf(context).height,
                 ),
@@ -89,7 +88,7 @@ class _LoginViewState extends State<_LoginView> {
 
 const double _overlap = 28;
 
-/// Deep-green identity band: logo, wordmark, and what the app is for.
+/// Violet identity band: logo, wordmark, and what the app is for.
 class _BrandBand extends StatelessWidget {
   const _BrandBand({required this.screenHeight});
 
@@ -115,27 +114,20 @@ class _BrandBand extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: AppTheme.onBrand,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'K',
-                    style: text.titleMedium?.copyWith(
-                      color: AppTheme.brand,
-                      fontWeight: FontWeight.w800,
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    Brand.iconAsset,
+                    width: 44,
+                    height: 44,
+                    semanticLabel: '${Brand.name} logo',
                   ),
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Kerjancok',
+                  Brand.name,
                   style: text.titleMedium?.copyWith(
-                    color: AppTheme.onBrand,
+                    color: BrandColors.offWhite,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
                   ),
@@ -146,7 +138,7 @@ class _BrandBand extends StatelessWidget {
             Text(
               'Your workday,\nin one place.',
               style: text.headlineMedium?.copyWith(
-                color: AppTheme.onBrand,
+                color: BrandColors.offWhite,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
               ),
@@ -155,7 +147,7 @@ class _BrandBand extends StatelessWidget {
             Text(
               'Clock in, request leave, and follow approvals.',
               style: text.bodyMedium?.copyWith(
-                color: AppTheme.onBrand.withValues(alpha: 0.8),
+                color: BrandColors.offWhite.withValues(alpha: 0.8),
               ),
             ),
           ],

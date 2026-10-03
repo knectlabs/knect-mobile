@@ -2,7 +2,7 @@
     <!-- Required to reach the Kerjancok API in every build type. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="Kerjancok"
+        android:label="Knect"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

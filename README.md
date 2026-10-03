@@ -1,4 +1,4 @@
-# Kerjancok Mobile
+# Knect Mobile (codename Kerjancok)
 
 Flutter employee self-service app for Kerjancok.
 
@@ -130,3 +130,14 @@ flutter build apk --debug
 ## Architecture direction
 
 Feature-first folders inspired by mature Flutter HR apps. API state and secure token storage stay isolated in core services.
+
+## Brand
+
+The app is branded **Knect** (ADR-016). The name, palette, and asset paths
+live in `lib/core/brand/brand.dart`. Source artwork is in `design/brand/`.
+Launcher icons were generated from it:
+
+- Android: legacy and adaptive (`mipmap-anydpi-v26`).
+- iOS: opaque `AppIcon` set.
+
+Regenerate the icons whenever the artwork changes.

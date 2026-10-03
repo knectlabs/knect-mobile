@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
 
+import '../brand/brand.dart';
+
 abstract final class AppTheme {
-  static const _seedColor = Color(0xFF176B52);
-  static const _lightSurface = Color(0xFFF7F5EF);
-  static const _darkSurface = Color(0xFF111714);
-
-  /// Brand surfaces (logo band, splash) stay deep green in both themes and
-  /// match the admin web `--brand` token.
-  static const brand = Color(0xFF176B52);
-  static const brandDark = Color(0xFF0F4A39);
-  static const onBrand = Color(0xFFF6FBF8);
-
-  static Color brandFor(Brightness brightness) =>
-      brightness == Brightness.dark ? brandDark : brand;
+  static const _lightSurface = Color(0xFFF8F7FC);
+  static const _darkSurface = Color(0xFF0F0B1E);
 
   static ThemeData get light => _build(
         ColorScheme.fromSeed(
-          seedColor: _seedColor,
+          seedColor: BrandColors.primaryViolet,
           brightness: Brightness.light,
           surface: _lightSurface,
+        ).copyWith(
+          // #583CCD keeps white button text above 4.5:1; #7D5CF5 does not.
+          primary: BrandColors.secondaryViolet,
+          onPrimary: Colors.white,
+          primaryContainer: BrandColors.lightLilac,
+          onPrimaryContainer: BrandColors.darkPurple,
+          onSurface: BrandColors.ink,
         ),
       );
 
   static ThemeData get dark => _build(
         ColorScheme.fromSeed(
-          seedColor: _seedColor,
+          seedColor: BrandColors.primaryViolet,
           brightness: Brightness.dark,
           surface: _darkSurface,
+        ).copyWith(
+          primary: BrandColors.softLilac,
+          onPrimary: BrandColors.darkPurple,
+          primaryContainer: BrandColors.deepViolet,
+          onPrimaryContainer: BrandColors.offWhite,
         ),
       );
 

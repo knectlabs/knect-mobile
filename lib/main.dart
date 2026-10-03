@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/brand/brand.dart';
 import 'core/config/app_config.dart';
 import 'core/network/api_client.dart';
 import 'core/routing/app_router.dart';
@@ -80,7 +81,7 @@ class _KerjancokAppState extends State<KerjancokApp> {
       child: BlocProvider.value(
         value: widget.authCubit,
         child: MaterialApp.router(
-          title: 'Kerjancok',
+          title: Brand.name,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,

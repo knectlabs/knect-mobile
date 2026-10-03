@@ -196,3 +196,30 @@ Reason:
 - avoids an unauthenticated tenant-creation surface and email verification work
 
 Revisit when platform-level tenant management (SUPER_ADMIN) is designed.
+
+---
+
+## ADR-016 — Customer-Facing Brand "Knect"
+
+**Status:** Accepted (2026-10-03)
+
+The product is presented to customers as **Knect**: app name, launcher
+label, logo, and in-app copy. "Kerjancok" remains the internal codename for
+repositories, packages, and the bundle id (`com.kerjancok.*`), and in
+engineering docs.
+
+Brand palette (from the app icon and wordmark):
+
+- primary violet `#7D5CF5`
+- secondary violet `#583CCD`; used for button fills because white text on
+  it stays above 4.5:1
+- deep violet `#3C249A`
+- dark purple `#1E1150`
+- darkest purple `#130A35`
+- ink `#19152B`
+- soft lilac `#AB9AFA`; the dark-mode primary
+- light lilac `#D8CEFC`
+- off-white `#EFE8FC`
+
+The mobile app is rebranded. The admin web still uses the former green
+identity until the admin phase.

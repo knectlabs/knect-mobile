@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/brand/brand.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../auth/application/auth_cubit.dart';
@@ -14,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     final user = context.select((AuthCubit cubit) => cubit.state.user);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Kerjancok')),
+      appBar: AppBar(title: const Text(Brand.name)),
       body: RefreshIndicator(
         onRefresh: () => context.read<AuthCubit>().refreshProfile(),
         child: ListView(
