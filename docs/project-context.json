@@ -1,0 +1,35 @@
+{
+  "project": "Kerjancok",
+  "document_version": "2.0",
+  "source_of_truth_order": [
+    "05_DECISIONS.md",
+    "00_AI_PROJECT_CONTEXT.md",
+    "03_ERD.md",
+    "01_PRD.md",
+    "02_ARCHITECTURE.md",
+    "04_ROADMAP.md",
+    "06_API_CONVENTIONS.md"
+  ],
+  "repositories": {
+    "api": "kerjancok-api",
+    "mobile": "kerjancok-mobile",
+    "admin": "kerjancok-admin"
+  },
+  "stack": {
+    "mobile": "Flutter",
+    "admin": "Next.js + TypeScript",
+    "backend": "NestJS + TypeScript",
+    "database": "PostgreSQL",
+    "orm": "Prisma",
+    "auth": "JWT + refresh token",
+    "package_manager": "npm"
+  },
+  "design_reference": {
+    "primary": "Mekari Talenta",
+    "rule": "Use as UX/information-architecture reference; do not create a pixel-perfect clone."
+  },
+  "additional_context_files": [
+    "07_RESEARCH_GAPS_AND_NOTES.md",
+    "08_MOBILE_UX_FLOWS.md"
+  ]
+}
