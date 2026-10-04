@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kerjancok_mobile/features/notifications/data/notifications_repository.dart';
+import 'package:knect_mobile/features/notifications/data/notifications_repository.dart';
 
 void main() {
   test('parses an approval notification target for mobile navigation', () {

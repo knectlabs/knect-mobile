@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kerjancok_mobile/core/network/api_failure.dart';
-import 'package:kerjancok_mobile/features/auth/application/auth_cubit.dart';
-import 'package:kerjancok_mobile/features/auth/application/login_cubit.dart';
+import 'package:knect_mobile/core/network/api_failure.dart';
+import 'package:knect_mobile/features/auth/application/auth_cubit.dart';
+import 'package:knect_mobile/features/auth/application/login_cubit.dart';
 
 import '../../../support/fake_auth_repository.dart';
 

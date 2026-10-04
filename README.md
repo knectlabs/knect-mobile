@@ -1,4 +1,4 @@
-# Knect Mobile (codename Kerjancok)
+# Knect Mobile
 
 Flutter employee self-service app for Knect.
 

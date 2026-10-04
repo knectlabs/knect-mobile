@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:kerjancok_mobile/core/network/api_failure.dart';
-import 'package:kerjancok_mobile/features/auth/data/auth_repository.dart';
-import 'package:kerjancok_mobile/features/auth/domain/auth_models.dart';
+import 'package:knect_mobile/core/network/api_failure.dart';
+import 'package:knect_mobile/features/auth/data/auth_repository.dart';
+import 'package:knect_mobile/features/auth/domain/auth_models.dart';
 
 const testUser = CurrentUser(
   id: 'user-1',

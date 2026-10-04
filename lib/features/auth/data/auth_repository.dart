@@ -20,7 +20,7 @@ abstract interface class AuthRepository {
   Future<void> signOutEverywhere();
 }
 
-/// Authentication calls against kerjancok-api (06_API_CONVENTIONS.md §2).
+/// Authentication calls against the Knect API (06_API_CONVENTIONS.md §2).
 /// Tokens never leave secure storage except as request headers/bodies.
 class ApiAuthRepository implements AuthRepository {
   ApiAuthRepository({

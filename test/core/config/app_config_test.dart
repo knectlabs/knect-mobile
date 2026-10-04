@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kerjancok_mobile/core/config/app_config.dart';
+import 'package:knect_mobile/core/config/app_config.dart';
 
 void main() {
   group('AppConfig', () {

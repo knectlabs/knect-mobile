@@ -4,10 +4,10 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kerjancok_mobile/core/config/app_config.dart';
-import 'package:kerjancok_mobile/core/network/api_client.dart';
-import 'package:kerjancok_mobile/core/network/api_failure.dart';
-import 'package:kerjancok_mobile/core/storage/token_storage.dart';
+import 'package:knect_mobile/core/config/app_config.dart';
+import 'package:knect_mobile/core/network/api_client.dart';
+import 'package:knect_mobile/core/network/api_failure.dart';
+import 'package:knect_mobile/core/storage/token_storage.dart';
 
 import '../../support/fake_token_storage.dart';
 

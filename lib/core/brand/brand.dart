@@ -1,7 +1,6 @@
 import 'package:flutter/painting.dart';
 
-/// Customer-facing brand. Repositories, packages, and internal docs keep the
-/// `kerjancok` codename.
+/// Customer-facing Knect brand.
 abstract final class Brand {
   static const name = 'Knect';
 

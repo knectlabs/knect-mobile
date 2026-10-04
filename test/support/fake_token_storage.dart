@@ -1,4 +1,4 @@
-import 'package:kerjancok_mobile/core/storage/token_storage.dart';
+import 'package:knect_mobile/core/storage/token_storage.dart';
 
 class FakeTokenStorage implements TokenStorage {
   FakeTokenStorage([this.tokens]);

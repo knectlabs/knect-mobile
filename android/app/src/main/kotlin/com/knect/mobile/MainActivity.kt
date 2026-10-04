@@ -1,4 +1,4 @@
-package com.kerjancok.kerjancok_mobile
+package com.knect.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

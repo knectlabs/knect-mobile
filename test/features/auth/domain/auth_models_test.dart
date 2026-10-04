@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kerjancok_mobile/core/storage/device_identity.dart';
-import 'package:kerjancok_mobile/features/auth/domain/auth_models.dart';
+import 'package:knect_mobile/core/storage/device_identity.dart';
+import 'package:knect_mobile/features/auth/domain/auth_models.dart';
 
 void main() {
   final sessionJson = <String, Object?>{

@@ -380,7 +380,7 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.kerjancok.kerjancok_mobile',
+          userAgentPackageName: 'com.knect.mobile',
         ),
         if (officePoint != null)
           CircleLayer(circles: [

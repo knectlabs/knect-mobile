@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kerjancok_mobile/core/network/api_failure.dart';
+import 'package:knect_mobile/core/network/api_failure.dart';
 
 void main() {
   final request = RequestOptions(path: '/health');

@@ -8,8 +8,8 @@ import 'api_failure.dart';
 
 /// Request option: do not try to refresh the session when this call returns
 /// 401 (sign-in and sign-out endpoints).
-const skipAuthRefresh = 'kerjancok.skipAuthRefresh';
-const _retried = 'kerjancok.retried';
+const skipAuthRefresh = 'knect.skipAuthRefresh';
+const _retried = 'knect.retried';
 
 class ApiClient {
   ApiClient({
