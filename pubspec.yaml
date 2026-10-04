@@ -20,6 +20,8 @@ dependencies:
   flutter_map: ^8.3.2
   latlong2: ^0.10.1
   url_launcher: ^6.3.3
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
 
 dev_dependencies:
   flutter_test:

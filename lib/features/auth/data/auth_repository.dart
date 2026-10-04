@@ -27,13 +27,16 @@ class ApiAuthRepository implements AuthRepository {
     required ApiClient api,
     required TokenStorage tokenStorage,
     required DeviceIdentity deviceIdentity,
+    Future<void> Function()? beforeSignOut,
   })  : _api = api,
         _tokens = tokenStorage,
-        _device = deviceIdentity;
+        _device = deviceIdentity,
+        _beforeSignOut = beforeSignOut;
 
   final ApiClient _api;
   final TokenStorage _tokens;
   final DeviceIdentity _device;
+  final Future<void> Function()? _beforeSignOut;
 
   /// Emits when the API rejected the session during an automatic refresh.
   @override
@@ -73,6 +76,7 @@ class ApiAuthRepository implements AuthRepository {
   /// Ends this device's session on the API (best effort) and locally.
   @override
   Future<void> signOut() async {
+    if (_beforeSignOut != null) await _beforeSignOut();
     final tokens = await _tokens.readTokens();
     if (tokens != null) {
       try {
@@ -93,6 +97,7 @@ class ApiAuthRepository implements AuthRepository {
   /// devices were signed out when they were not.
   @override
   Future<void> signOutEverywhere() async {
+    if (_beforeSignOut != null) await _beforeSignOut();
     await _api.dio.post<void>('/auth/logout-all');
     await _tokens.clearTokens();
   }

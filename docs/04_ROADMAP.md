@@ -366,7 +366,10 @@ history, and PIN/biometric are not shown until their backends exist.
   approval inbox (approve/reject with comment) for managers and HR.
 - **1F** Overtime and attendance-correction requests (correction times are
   sent as UTC instants of organization-local wall-clock times).
-- **1G** Notification center with unread badge, mark read, mark all read.
+- **1G** Notification center with unread badge, mark read, mark all read, and
+  FCM delivery. Foreground messages show an in-app prompt; a background or
+  terminated-app notification tap reuses the request deep link to open the
+  exact leave, overtime, or attendance-correction request.
 
 Verified: `flutter analyze`, the existing tests, every 1D–1G call replayed
 against the API with the app's payloads, and on the Android emulator against

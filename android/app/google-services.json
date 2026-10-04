@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1052142787410",
+    "project_id": "knect-1c1b5",
+    "storage_bucket": "knect-1c1b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052142787410:android:b736e41eaa8a5559ccf88b",
+        "android_client_info": {
+          "package_name": "com.knect.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJXCY2J8qp4AZt9olLcGB9VceZzMGM6_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

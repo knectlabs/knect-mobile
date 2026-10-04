@@ -93,6 +93,11 @@ an unexpected API.
 - **Sign-out:** sign out of this device (`/auth/logout`, best effort), or sign
   out of all devices (`/auth/logout-all`). Signing out of all devices fails
   visibly when offline.
+- **Push delivery:** Firebase Cloud Messaging requests notification permission
+  after authentication, registers the current device token with the API, and
+  removes it before sign-out. Token rotation is registered automatically.
+  FCM contains navigation metadata only; the persisted Inbox notification
+  remains authoritative.
 - **Navigation:** Home, Employees, Request, Inbox, and Account are the main
   tabs. Live Attendance and the manager approval list open from focused actions.
 - **Not yet:** forgot or reset password (needs email delivery on the API).
@@ -116,7 +121,7 @@ flutter build apk --debug
 - Login with JWT access + refresh token
 - Today status, attendance, GPS checks, selfie evidence, and attendance history
 - Leave, overtime, and attendance-correction requests
-- Manager approval inbox and in-app notifications
+- Manager approval inbox, in-app notifications, and FCM delivery
 - Employee directory and self profile
 
 ## Planned features

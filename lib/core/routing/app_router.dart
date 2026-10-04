@@ -28,6 +28,7 @@ class AppRouter {
     _refresh = _RouterRefresh(authCubit.stream);
     router = GoRouter(
       initialLocation: AppRoutes.home,
+      navigatorKey: navigatorKey,
       refreshListenable: _refresh,
       redirect: (context, state) {
         final status = authCubit.state.status;
@@ -75,6 +76,7 @@ class AppRouter {
   }
 
   late final _RouterRefresh _refresh;
+  final navigatorKey = GlobalKey<NavigatorState>();
   late final GoRouter router;
 
   void dispose() {
