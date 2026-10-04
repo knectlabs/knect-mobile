@@ -89,7 +89,8 @@ class _KnectAppState extends State<KnectApp> {
       onOpened: _openNotification,
     );
     if (widget.authCubit.state.status == AuthStatus.authenticated) {
-      unawaited(widget.firebaseNotifications!.start());
+      final notifications = widget.firebaseNotifications;
+      if (notifications != null) unawaited(notifications.start());
     }
   }
 
