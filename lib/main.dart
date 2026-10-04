@@ -20,6 +20,7 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/employee/data/directory_repository.dart';
 import 'features/employee/data/employee_repository.dart';
 import 'features/notifications/data/notifications_repository.dart';
+import 'features/payroll/data/payslip_repository.dart';
 import 'features/requests/data/requests_repository.dart';
 import 'features/shell/signed_in_scope.dart';
 import 'firebase_options.dart';
@@ -125,6 +126,7 @@ class _KnectAppState extends State<KnectApp> {
         RepositoryProvider(
           create: (_) => NotificationsRepository(widget.apiClient),
         ),
+        RepositoryProvider(create: (_) => PayslipRepository(widget.apiClient)),
       ],
       child: BlocProvider.value(
         value: widget.authCubit,
