@@ -16,7 +16,10 @@ enum _Kind { leave, overtime, correction }
 
 /// Requests tab: leave balances, own requests, and the approval inbox entry.
 class RequestsScreen extends StatefulWidget {
-  const RequestsScreen({super.key});
+  const RequestsScreen({this.target, super.key});
+
+  /// Set when the screen was opened from a notification deep link.
+  final RequestTarget? target;
 
   @override
   State<RequestsScreen> createState() => _RequestsScreenState();
@@ -24,6 +27,16 @@ class RequestsScreen extends StatefulWidget {
 
 class _RequestsScreenState extends State<RequestsScreen> {
   _Kind _kind = _Kind.leave;
+
+  @override
+  void initState() {
+    super.initState();
+    final target = widget.target;
+    if (target == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) pushPage(context, RequestTargetScreen(target: target));
+    });
+  }
 
   Future<void> _new() async {
     final page = switch (_kind) {
@@ -116,6 +129,67 @@ class _RequestsScreenState extends State<RequestsScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Loads a request by ID, so a notification can open an item beyond the list's
+/// first page and always shows the server's latest approval status.
+class RequestTargetScreen extends StatefulWidget {
+  const RequestTargetScreen({required this.target, super.key});
+
+  final RequestTarget target;
+
+  @override
+  State<RequestTargetScreen> createState() => _RequestTargetScreenState();
+}
+
+class _RequestTargetScreenState extends State<RequestTargetScreen> {
+  late Future<EmployeeRequest> _request;
+
+  @override
+  void initState() {
+    super.initState();
+    _request = context.read<RequestsRepository>().request(widget.target);
+  }
+
+  void _retry() => setState(
+        () => _request =
+            context.read<RequestsRepository>().request(widget.target),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final repository = context.read<RequestsRepository>();
+    return FutureBuilder<EmployeeRequest>(
+      future: _request,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Request')),
+            body: ErrorView(
+              message: failureMessage(apiFailureOf(snapshot.error!)),
+              onRetry: _retry,
+            ),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final request = snapshot.data!;
+        return Scaffold(
+          appBar: AppBar(title: const Text('Request details')),
+          body: _RequestDetail(
+            request: request,
+            title: _title(context, request),
+            subtitle: _subtitle(context, request),
+            requests: context.read<RequestsCubit>(),
+            repository: repository,
+          ),
+        );
+      },
     );
   }
 }

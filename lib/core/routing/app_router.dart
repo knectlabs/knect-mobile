@@ -12,6 +12,7 @@ import '../../features/inbox/presentation/inbox_screen.dart';
 import '../../features/notifications/data/notifications_repository.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/requests/presentation/requests_screen.dart';
+import '../../features/requests/data/requests_repository.dart';
 
 abstract final class AppRoutes {
   static const login = '/login';
@@ -58,7 +59,14 @@ class AppRouter {
               (AppRoutes.account, ProfileScreen()),
             ])
               StatefulShellBranch(
-                routes: [GoRoute(path: path, builder: (_, __) => screen)],
+                routes: [
+                  GoRoute(
+                    path: path,
+                    builder: (_, state) => path == AppRoutes.requests
+                        ? RequestsScreen(target: _requestTarget(state))
+                        : screen,
+                  ),
+                ],
               ),
           ],
         ),
@@ -73,6 +81,13 @@ class AppRouter {
     router.dispose();
     _refresh.dispose();
   }
+}
+
+RequestTarget? _requestTarget(GoRouterState state) {
+  final type = state.uri.queryParameters['targetType'];
+  final id = state.uri.queryParameters['targetId'];
+  if (type == null || id == null || id.isEmpty) return null;
+  return RequestTarget(type: type, id: id);
 }
 
 class _TabShell extends StatelessWidget {

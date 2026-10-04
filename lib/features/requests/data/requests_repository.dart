@@ -39,11 +39,13 @@ sealed class EmployeeRequest {
       : id = json.str('id'),
         status = json.str('status'),
         reason = json.strOrNull('reason') ?? '',
+        approvalId = json.strOrNull('approvalId'),
         submittedAt = json.time('submittedAt');
 
   final String id;
   final String status;
   final String reason;
+  final String? approvalId;
   final DateTime submittedAt;
 
   bool get isPending => status == 'PENDING';
@@ -54,12 +56,18 @@ class LeaveRequest extends EmployeeRequest {
       : leaveTypeName = json.obj('leaveType').str('name'),
         startDate = json.str('startDate'),
         endDate = json.str('endDate'),
-        requestedDays = (json['requestedDays'] as num).toDouble();
+        requestedDays = (json['requestedDays'] as num).toDouble(),
+        proofUrl = json.strOrNull('proofUrl'),
+        decidedAt = json.timeOrNull('decidedAt'),
+        cancelledAt = json.timeOrNull('cancelledAt');
 
   final String leaveTypeName;
   final String startDate;
   final String endDate;
   final double requestedDays;
+  final String? proofUrl;
+  final DateTime? decidedAt;
+  final DateTime? cancelledAt;
 }
 
 class OvertimeRequest extends EmployeeRequest {
@@ -68,24 +76,38 @@ class OvertimeRequest extends EmployeeRequest {
         startAt = json.time('startAt'),
         endAt = json.time('endAt'),
         requestedMinutes = json.integer('requestedMinutes'),
-        approvedMinutes = json.intOrNull('approvedMinutes');
+        approvedMinutes = json.intOrNull('approvedMinutes'),
+        decidedAt = json.timeOrNull('decidedAt');
 
   final String date;
   final DateTime startAt;
   final DateTime endAt;
   final int requestedMinutes;
   final int? approvedMinutes;
+  final DateTime? decidedAt;
 }
 
 class CorrectionRequest extends EmployeeRequest {
   CorrectionRequest.fromJson(super.json)
       : date = json.str('date'),
         clockInAt = json.timeOrNull('requestedClockInAt'),
-        clockOutAt = json.timeOrNull('requestedClockOutAt');
+        clockOutAt = json.timeOrNull('requestedClockOutAt'),
+        attachmentUrl = json.strOrNull('attachmentUrl'),
+        decidedAt = json.timeOrNull('decidedAt');
 
   final String date;
   final DateTime? clockInAt;
   final DateTime? clockOutAt;
+  final String? attachmentUrl;
+  final DateTime? decidedAt;
+}
+
+/// A notification target for one employee request.
+class RequestTarget {
+  const RequestTarget({required this.type, required this.id});
+
+  final String type;
+  final String id;
 }
 
 class RequestsRepository {
@@ -115,6 +137,27 @@ class RequestsRepository {
         await _api.dio
             .get('/attendance-corrections/me', queryParameters: {'limit': 50}),
       ).map(CorrectionRequest.fromJson).toList();
+
+  /// Fetches the exact request referenced by an in-app or push notification.
+  Future<EmployeeRequest> request(RequestTarget target) async {
+    final path = switch (target.type) {
+      'LEAVE_REQUEST' => '/leave-requests',
+      'OVERTIME_REQUEST' => '/overtime',
+      'ATTENDANCE_CORRECTION' => '/attendance-corrections',
+      _ => throw ArgumentError.value(
+          target.type,
+          'target.type',
+          'Unknown request type',
+        ),
+    };
+    final json = data(await _api.dio.get('$path/${target.id}'));
+    return switch (target.type) {
+      'LEAVE_REQUEST' => LeaveRequest.fromJson(json),
+      'OVERTIME_REQUEST' => OvertimeRequest.fromJson(json),
+      'ATTENDANCE_CORRECTION' => CorrectionRequest.fromJson(json),
+      _ => throw StateError('Unknown request type'),
+    };
+  }
 
   Future<void> submitLeave({
     required String leaveTypeId,

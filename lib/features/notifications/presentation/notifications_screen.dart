@@ -110,7 +110,16 @@ class NotificationsList extends StatelessWidget {
       await pushPage(context, const ApprovalsScreen());
       return;
     }
-    context.go(AppRoutes.requests);
+    final target = notification.target!;
+    context.go(
+      Uri(
+        path: AppRoutes.requests,
+        queryParameters: {
+          'targetType': target.type,
+          'targetId': target.id,
+        },
+      ).toString(),
+    );
   }
 }
 
