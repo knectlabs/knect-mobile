@@ -19,6 +19,8 @@ import '../../employee/data/directory_repository.dart';
 import '../../employee/presentation/team_activity_screen.dart';
 import '../../notifications/data/notifications_repository.dart';
 import '../../payroll/presentation/payslips_screen.dart';
+import '../../performance/presentation/my_goals_screen.dart';
+import '../../performance/presentation/my_reviews_screen.dart';
 import '../../requests/application/requests_cubit.dart';
 import '../../requests/presentation/request_forms.dart';
 import '../../shell/signed_in_scope.dart';
@@ -56,6 +58,10 @@ class HomeScreen extends StatelessWidget {
           () => context.go(AppRoutes.requests)),
       _App(Icons.receipt_long, 'Payslip', BrandColors.primaryViolet,
           () => pushPage(context, const PayslipsScreen())),
+      _App(Icons.flag, 'My Goals', BrandColors.primaryViolet,
+          () => pushPage(context, const MyGoalsScreen())),
+      _App(Icons.rate_review, 'My Reviews', BrandColors.primaryViolet,
+          () => pushPage(context, const MyReviewsScreen())),
       if (canApprove(user?.role))
         _App(Icons.fact_check, 'Approvals', BrandColors.primaryViolet,
             () => pushPage(context, const ApprovalsScreen())),
