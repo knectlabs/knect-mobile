@@ -62,7 +62,9 @@ class _RequestFormState extends State<_RequestForm> {
       requests.load();
       navigator.pop(true);
       messenger.showSnackBar(
-        SnackBar(content: Text(widget.successMessage), behavior: SnackBarBehavior.floating),
+        SnackBar(
+            content: Text(widget.successMessage),
+            behavior: SnackBarBehavior.floating),
       );
     } catch (error) {
       if (mounted) {
@@ -84,7 +86,10 @@ class _RequestFormState extends State<_RequestForm> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
-            for (final field in widget.fields) ...[field, const SizedBox(height: 14)],
+            for (final field in widget.fields) ...[
+              field,
+              const SizedBox(height: 14)
+            ],
             if (_error != null)
               Container(
                 padding: const EdgeInsets.all(14),
@@ -92,7 +97,8 @@ class _RequestFormState extends State<_RequestForm> {
                   color: colors.errorContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(_error!, style: TextStyle(color: colors.onErrorContainer)),
+                child: Text(_error!,
+                    style: TextStyle(color: colors.onErrorContainer)),
               ),
           ],
         ),
@@ -193,7 +199,8 @@ class LeaveFormScreen extends StatefulWidget {
 }
 
 class _LeaveTypesCubit extends LoadCubit<List<LeaveType>> {
-  _LeaveTypesCubit(RequestsRepository repository) : super(repository.leaveTypes);
+  _LeaveTypesCubit(RequestsRepository repository)
+      : super(repository.leaveTypes);
 }
 
 class _LeaveFormScreenState extends State<LeaveFormScreen> {
@@ -212,8 +219,10 @@ class _LeaveFormScreenState extends State<LeaveFormScreen> {
   Widget build(BuildContext context) {
     final today = Clock.today(_timezoneOf(context));
     final balances =
-        context.watch<RequestsCubit>().state.valueOrPrevious?.balances ?? const [];
-    final balance = balances.where((b) => b.leaveTypeId == _type?.id).firstOrNull;
+        context.watch<RequestsCubit>().state.valueOrPrevious?.balances ??
+            const [];
+    final balance =
+        balances.where((b) => b.leaveTypeId == _type?.id).firstOrNull;
 
     return BlocProvider(
       create: (context) => _LeaveTypesCubit(context.read<RequestsRepository>()),
@@ -225,8 +234,12 @@ class _LeaveFormScreenState extends State<LeaveFormScreen> {
             submitLabel: 'Submit request',
             successMessage: 'Leave request submitted for approval.',
             validate: () {
-              if (_type == null) return 'Choose a leave type.';
-              if (_start == null || _end == null) return 'Choose the start and end dates.';
+              if (_type == null) {
+                return 'Choose a leave type.';
+              }
+              if (_start == null || _end == null) {
+                return 'Choose the start and end dates.';
+              }
               if (_reason.text.trim().isEmpty) return 'Add a reason.';
               return null;
             },
@@ -293,7 +306,8 @@ class _LeaveFormScreenState extends State<LeaveFormScreen> {
                 icon: Icons.event_outlined,
                 value: _end == null ? null : Clock.date(_end!),
                 onTap: () async {
-                  final first = _start ?? today.subtract(const Duration(days: 30));
+                  final first =
+                      _start ?? today.subtract(const Duration(days: 30));
                   final picked = await _pickDate(
                     context,
                     initial: _end ?? first,
@@ -314,7 +328,9 @@ class _LeaveFormScreenState extends State<LeaveFormScreen> {
 
 /// "1 day", "2.5 days".
 String leaveDays(double value) {
-  final text = value == value.roundToDouble() ? value.toInt().toString() : value.toString();
+  final text = value == value.roundToDouble()
+      ? value.toInt().toString()
+      : value.toString();
   return '$text ${value == 1 ? 'day' : 'days'}';
 }
 
@@ -341,7 +357,8 @@ class _OvertimeFormScreenState extends State<OvertimeFormScreen> {
 
   int? get _minutes {
     if (_start == null || _end == null) return null;
-    var minutes = (_end!.hour * 60 + _end!.minute) - (_start!.hour * 60 + _start!.minute);
+    var minutes =
+        (_end!.hour * 60 + _end!.minute) - (_start!.hour * 60 + _start!.minute);
     if (minutes <= 0) minutes += 24 * 60;
     return minutes;
   }
@@ -350,7 +367,9 @@ class _OvertimeFormScreenState extends State<OvertimeFormScreen> {
     final picked = await showTimePicker(
       context: context,
       initialTime: (start ? _start : _end) ??
-          (start ? const TimeOfDay(hour: 17, minute: 0) : const TimeOfDay(hour: 19, minute: 0)),
+          (start
+              ? const TimeOfDay(hour: 17, minute: 0)
+              : const TimeOfDay(hour: 19, minute: 0)),
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
         child: child!,
@@ -369,8 +388,12 @@ class _OvertimeFormScreenState extends State<OvertimeFormScreen> {
       submitLabel: 'Submit request',
       successMessage: 'Overtime request submitted for approval.',
       validate: () {
-        if (_start == null || _end == null) return 'Choose the start and end time.';
-        if (_reason.text.trim().isEmpty) return 'Add a reason.';
+        if (_start == null || _end == null) {
+          return 'Choose the start and end time.';
+        }
+        if (_reason.text.trim().isEmpty) {
+          return 'Add a reason.';
+        }
         return null;
       },
       submit: (repository) => repository.submitOvertime(
@@ -455,7 +478,9 @@ class _CorrectionFormScreenState extends State<CorrectionFormScreen> {
     final picked = await showTimePicker(
       context: context,
       initialTime: (clockIn ? _in : _out) ??
-          (clockIn ? const TimeOfDay(hour: 8, minute: 0) : const TimeOfDay(hour: 17, minute: 0)),
+          (clockIn
+              ? const TimeOfDay(hour: 8, minute: 0)
+              : const TimeOfDay(hour: 17, minute: 0)),
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
         child: child!,
@@ -484,8 +509,12 @@ class _CorrectionFormScreenState extends State<CorrectionFormScreen> {
       submitLabel: 'Submit correction',
       successMessage: 'Correction submitted for approval.',
       validate: () {
-        if (_in == null && _out == null) return 'Enter the clock-in time, clock-out time, or both.';
-        if (_reason.text.trim().isEmpty) return 'Explain what happened.';
+        if (_in == null && _out == null) {
+          return 'Enter the clock-in time, clock-out time, or both.';
+        }
+        if (_reason.text.trim().isEmpty) {
+          return 'Explain what happened.';
+        }
         return null;
       },
       submit: (repository) {

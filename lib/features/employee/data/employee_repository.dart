@@ -43,7 +43,8 @@ class EmployeeRepository {
   /// Null when the account has no employee profile (admins, HR without one).
   Future<EmployeeProfile?> me() async {
     try {
-      return EmployeeProfile.fromJson(data(await _api.dio.get('/employees/me')));
+      return EmployeeProfile.fromJson(
+          data(await _api.dio.get('/employees/me')));
     } catch (error) {
       if (apiFailureOf(error).statusCode == 404) return null;
       rethrow;

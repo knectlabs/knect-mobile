@@ -20,7 +20,8 @@ class LargeTitle extends StatelessWidget {
         children: [
           Text(
             title,
-            style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+            style: theme.textTheme.headlineMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
           if (trailingText != null) ...[
             const SizedBox(width: 12),

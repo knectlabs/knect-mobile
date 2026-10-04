@@ -103,7 +103,8 @@ class RequestsRepository {
           .toList();
 
   Future<List<LeaveRequest>> leaveRequests() async => dataList(
-        await _api.dio.get('/leave-requests/me', queryParameters: {'limit': 50}),
+        await _api.dio
+            .get('/leave-requests/me', queryParameters: {'limit': 50}),
       ).map(LeaveRequest.fromJson).toList();
 
   Future<List<OvertimeRequest>> overtime() async => dataList(

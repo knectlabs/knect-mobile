@@ -76,10 +76,15 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                         : people
                             .where((p) =>
                                 p.fullName.toLowerCase().contains(query) ||
-                                (p.position ?? '').toLowerCase().contains(query) ||
-                                (p.department ?? '').toLowerCase().contains(query))
+                                (p.position ?? '')
+                                    .toLowerCase()
+                                    .contains(query) ||
+                                (p.department ?? '')
+                                    .toLowerCase()
+                                    .contains(query))
                             .toList();
-                    return _DirectoryList(people: matches, showAway: query.isEmpty);
+                    return _DirectoryList(
+                        people: matches, showAway: query.isEmpty);
                   },
                 ),
               ),
@@ -108,7 +113,8 @@ class _DirectoryList extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
         child: Text(
           'On leave today',
-          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          style: theme.textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w700),
         ),
       ));
       rows.add(
@@ -160,7 +166,8 @@ class _DirectoryList extends StatelessWidget {
 
     String? letter;
     for (final person in people) {
-      final initial = person.fullName.isEmpty ? '#' : person.fullName[0].toUpperCase();
+      final initial =
+          person.fullName.isEmpty ? '#' : person.fullName[0].toUpperCase();
       if (initial != letter) {
         letter = initial;
         rows.add(Container(
@@ -209,7 +216,9 @@ class _PersonTile extends StatelessWidget {
               children: [
                 Text(person.fullName, style: theme.textTheme.titleSmall),
                 Text(
-                  person.onLeaveToday ? '${person.subtitle} · On leave' : person.subtitle,
+                  person.onLeaveToday
+                      ? '${person.subtitle} · On leave'
+                      : person.subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(color: muted),
                 ),
               ],
@@ -217,7 +226,9 @@ class _PersonTile extends StatelessWidget {
           ),
           IconButton(
             tooltip: 'Call',
-            onPressed: phone == null ? null : () => open(Uri(scheme: 'tel', path: phone)),
+            onPressed: phone == null
+                ? null
+                : () => open(Uri(scheme: 'tel', path: phone)),
             icon: const Icon(Icons.call_outlined),
           ),
           IconButton(

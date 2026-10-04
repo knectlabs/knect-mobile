@@ -22,7 +22,7 @@ Future<FakeAuthRepository> pumpApp(
   final authCubit = AuthCubit(repo);
   await authCubit.restoreSession();
   await tester.pumpWidget(
-    KerjancokApp(
+    KnectApp(
       config: config,
       apiClient: ApiClient(config: config, tokenStorage: FakeTokenStorage()),
       authRepository: repo,

@@ -145,7 +145,8 @@ class _ShiftCard extends StatelessWidget {
                 ],
               ),
             )
-          : const SizedBox(height: 150, child: Center(child: CircularProgressIndicator()));
+          : const SizedBox(
+              height: 150, child: Center(child: CircularProgressIndicator()));
     } else {
       final schedule = today.schedule;
       final tz = schedule.timezone;
@@ -172,7 +173,8 @@ class _ShiftCard extends StatelessWidget {
             if (!schedule.scheduled) ...[
               Text(
                 'No shift today',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               Text('Enjoy your day off.', style: theme.textTheme.bodyMedium),
@@ -184,11 +186,13 @@ class _ShiftCard extends StatelessWidget {
                 children: [
                   Text(
                     schedule.shiftName ?? 'Shift',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   if ((schedule.office?.name ?? schedule.officeName) != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
                         color: colors.surfaceContainerLowest,
                         borderRadius: BorderRadius.circular(99),
@@ -210,14 +214,17 @@ class _ShiftCard extends StatelessWidget {
                   ),
                   children: [
                     if (overnight)
-                      TextSpan(text: ' (+1d)', style: theme.textTheme.bodyMedium),
+                      TextSpan(
+                          text: ' (+1d)', style: theme.textTheme.bodyMedium),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               _ClockButtons(next: next.action),
               const SizedBox(height: 12),
-              Text(status, style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+              Text(status,
+                  style: theme.textTheme.bodySmall,
+                  textAlign: TextAlign.center),
             ],
           ],
         ),
@@ -229,7 +236,8 @@ class _ShiftCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BrandColors.primaryViolet.withValues(alpha: 0.35)),
+        border: Border.all(
+            color: BrandColors.primaryViolet.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -253,7 +261,8 @@ class _ShiftCard extends StatelessWidget {
             style: TextButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
               shape: const RoundedRectangleBorder(),
-              textStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+              textStyle: theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
             onPressed: () => pushPage(context, const AttendanceScreen()),
             child: const Text('Open Live Attendance'),
@@ -292,7 +301,8 @@ class _ClockButtons extends StatelessWidget {
                   const SizedBox(width: 10),
                   Text(
                     label,
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -314,8 +324,13 @@ class _ClockButtons extends StatelessWidget {
           children: [
             half(ClockAction.clockIn, Icons.login_rounded, 'Clock In',
                 BrandColors.secondaryViolet),
-            VerticalDivider(width: 1, indent: 10, endIndent: 10, color: colors.outlineVariant),
-            half(ClockAction.clockOut, Icons.logout_rounded, 'Clock Out', colors.error),
+            VerticalDivider(
+                width: 1,
+                indent: 10,
+                endIndent: 10,
+                color: colors.outlineVariant),
+            half(ClockAction.clockOut, Icons.logout_rounded, 'Clock Out',
+                colors.error),
           ],
         ),
       ),
@@ -421,12 +436,14 @@ class _DirectReports extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'My direct reports',
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),
                   TextButton(
                     key: const Key('home.viewActivity'),
-                    onPressed: () => pushPage(context, TeamActivityScreen(reports: reports)),
+                    onPressed: () =>
+                        pushPage(context, TeamActivityScreen(reports: reports)),
                     child: const Text('View activity'),
                   ),
                 ],
@@ -439,7 +456,8 @@ class _DirectReports extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 10),
                       child: Tooltip(
                         message: person.fullName,
-                        child: InitialsAvatar(name: person.fullName, radius: 24),
+                        child:
+                            InitialsAvatar(name: person.fullName, radius: 24),
                       ),
                     ),
                   if (reports.length > shown)

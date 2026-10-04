@@ -36,12 +36,14 @@ class _ApprovalsAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _ApprovalsAppBar();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + kTextTabBarHeight);
+  Size get preferredSize =>
+      const Size.fromHeight(kToolbarHeight + kTextTabBarHeight);
 
   @override
   Widget build(BuildContext context) => AppBar(
         title: const Text('Approvals'),
-        bottom: const TabBar(tabs: [Tab(text: 'Pending'), Tab(text: 'Decided')]),
+        bottom:
+            const TabBar(tabs: [Tab(text: 'Pending'), Tab(text: 'Decided')]),
       );
 }
 
@@ -92,12 +94,16 @@ class _Inbox extends StatelessWidget {
             : ListView.separated(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: approvals.length,
-                separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
+                separatorBuilder: (_, __) =>
+                    const Divider(height: 1, indent: 72),
                 itemBuilder: (context, index) => _ApprovalTile(
                   approval: approvals[index],
                   timezone: tz,
-                  trailing: pending ? null : StatusChip.approval(approvals[index].status),
-                  onTap: pending ? () => _decide(context, approvals[index]) : null,
+                  trailing: pending
+                      ? null
+                      : StatusChip.approval(approvals[index].status),
+                  onTap:
+                      pending ? () => _decide(context, approvals[index]) : null,
                 ),
               ),
       ),
@@ -194,10 +200,12 @@ class _DecisionSheetState extends State<_DecisionSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(approval.typeLabel.toUpperCase(), style: theme.textTheme.labelMedium),
+            Text(approval.typeLabel.toUpperCase(),
+                style: theme.textTheme.labelMedium),
             const SizedBox(height: 4),
             Text(approval.requesterName, style: theme.textTheme.titleLarge),
-            if (approval.title != null) Text(approval.title!, style: theme.textTheme.bodyLarge),
+            if (approval.title != null)
+              Text(approval.title!, style: theme.textTheme.bodyLarge),
             if (approval.subtitle != null)
               Text(
                 approval.subtitle!,
@@ -246,7 +254,8 @@ class _DecisionSheetState extends State<_DecisionSheet> {
                       minimumSize: const Size.fromHeight(52),
                     ),
                     onPressed: busy ? null : () => _submit(false),
-                    child: Text(_busyApprove == false ? 'Rejecting…' : 'Reject'),
+                    child:
+                        Text(_busyApprove == false ? 'Rejecting…' : 'Reject'),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -254,7 +263,8 @@ class _DecisionSheetState extends State<_DecisionSheet> {
                   child: FilledButton(
                     key: const Key('approval.approve'),
                     onPressed: busy ? null : () => _submit(true),
-                    child: Text(_busyApprove == true ? 'Approving…' : 'Approve'),
+                    child:
+                        Text(_busyApprove == true ? 'Approving…' : 'Approve'),
                   ),
                 ),
               ],
@@ -302,10 +312,13 @@ class _ApprovalTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(approval.requesterName, style: theme.textTheme.titleSmall),
+                  Text(approval.requesterName,
+                      style: theme.textTheme.titleSmall),
                   Text(
-                    [approval.title ?? approval.typeLabel, if (approval.subtitle != null) approval.subtitle!]
-                        .join(' · '),
+                    [
+                      approval.title ?? approval.typeLabel,
+                      if (approval.subtitle != null) approval.subtitle!
+                    ].join(' · '),
                     style: muted,
                   ),
                   const SizedBox(height: 2),
@@ -316,7 +329,9 @@ class _ApprovalTile extends StatelessWidget {
                 ],
               ),
             ),
-            trailing ?? Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
+            trailing ??
+                Icon(Icons.chevron_right,
+                    color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
       ),

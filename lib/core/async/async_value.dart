@@ -58,8 +58,8 @@ class LoadCubit<T> extends Cubit<AsyncValue<T>> {
 String failureMessage(ApiFailure failure) => switch (failure.kind) {
       ApiFailureKind.network => 'No connection. Check your internet and retry.',
       ApiFailureKind.timeout => 'The server is taking too long. Try again.',
-      ApiFailureKind.http when failure.statusCode != null &&
-              failure.statusCode! >= 500 =>
+      ApiFailureKind.http
+          when failure.statusCode != null && failure.statusCode! >= 500 =>
         'Something went wrong on our side. Try again shortly.',
       ApiFailureKind.http => failure.message,
       _ => 'Something went wrong. Try again.',

@@ -61,7 +61,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Card(
                 margin: EdgeInsets.zero,
                 child: ListTile(
-                  leading: Icon(Icons.fact_check_outlined, color: theme.colorScheme.primary),
+                  leading: Icon(Icons.fact_check_outlined,
+                      color: theme.colorScheme.primary),
                   title: const Text('Approval inbox'),
                   subtitle: const Text('Requests from your team'),
                   trailing: const Icon(Icons.chevron_right),
@@ -75,16 +76,19 @@ class _RequestsScreenState extends State<RequestsScreen> {
               segments: const [
                 ButtonSegment(value: _Kind.leave, label: Text('Leave')),
                 ButtonSegment(value: _Kind.overtime, label: Text('Overtime')),
-                ButtonSegment(value: _Kind.correction, label: Text('Correction')),
+                ButtonSegment(
+                    value: _Kind.correction, label: Text('Correction')),
               ],
               selected: {_kind},
-              onSelectionChanged: (selection) => setState(() => _kind = selection.first),
+              onSelectionChanged: (selection) =>
+                  setState(() => _kind = selection.first),
             ),
             const SizedBox(height: 16),
             AsyncView(
               value: state,
               onRetry: context.read<RequestsCubit>().load,
-              loading: const SizedBox(height: 320, child: SkeletonList(count: 3)),
+              loading:
+                  const SizedBox(height: 320, child: SkeletonList(count: 3)),
               builder: (overview) => switch (_kind) {
                 _Kind.leave => Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -216,9 +220,11 @@ class _RequestList extends StatelessWidget {
 String? _tz(BuildContext context) =>
     context.read<AuthCubit>().state.user?.organization.timezone;
 
-String _title(BuildContext context, EmployeeRequest request) => switch (request) {
+String _title(BuildContext context, EmployeeRequest request) =>
+    switch (request) {
       LeaveRequest r => r.leaveTypeName,
-      OvertimeRequest r => '${Clock.duration(r.approvedMinutes ?? r.requestedMinutes)} overtime',
+      OvertimeRequest r =>
+        '${Clock.duration(r.approvedMinutes ?? r.requestedMinutes)} overtime',
       CorrectionRequest r => 'Correction · ${Clock.shortDate(r.date)}',
     };
 
@@ -307,7 +313,9 @@ class _RequestDetailState extends State<_RequestDetail> {
           children: [
             Row(
               children: [
-                Expanded(child: Text(widget.title, style: theme.textTheme.titleLarge)),
+                Expanded(
+                    child:
+                        Text(widget.title, style: theme.textTheme.titleLarge)),
                 StatusChip.approval(request.status),
               ],
             ),

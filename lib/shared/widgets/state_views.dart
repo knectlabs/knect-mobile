@@ -47,9 +47,11 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off_outlined, size: 40, color: theme.colorScheme.error),
+            Icon(Icons.cloud_off_outlined,
+                size: 40, color: theme.colorScheme.error),
             const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
+            Text(message,
+                textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: onRetry,
@@ -91,7 +93,8 @@ class EmptyView extends StatelessWidget {
             child: Icon(icon, color: theme.colorScheme.onPrimaryContainer),
           ),
           const SizedBox(height: 14),
-          Text(title, style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
+          Text(title,
+              style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
           if (message != null) ...[
             const SizedBox(height: 6),
             Text(
@@ -174,7 +177,10 @@ class StatusChip extends StatelessWidget {
           colors.error.withValues(alpha: dark ? 0.2 : 0.12),
           dark ? colors.error : colors.onErrorContainer,
         ),
-      StatusTone.neutral => (colors.surfaceContainerHighest, colors.onSurfaceVariant),
+      StatusTone.neutral => (
+          colors.surfaceContainerHighest,
+          colors.onSurfaceVariant
+        ),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -184,7 +190,8 @@ class StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: foreground, fontSize: 12, fontWeight: FontWeight.w600),
+        style: TextStyle(
+            color: foreground, fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -195,5 +202,6 @@ enum StatusTone { neutral, success, warning, danger }
 void showMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(message), behavior: SnackBarBehavior.floating));
+    ..showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating));
 }

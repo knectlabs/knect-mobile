@@ -49,7 +49,8 @@ class InboxScreen extends StatelessWidget {
                 ),
               ),
               TabBar(
-                labelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                labelStyle: theme.textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w600),
                 tabs: const [
                   Tab(text: 'Notifications'),
                   Tab(text: 'Need My Approval'),

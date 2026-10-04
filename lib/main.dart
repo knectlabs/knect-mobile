@@ -33,7 +33,7 @@ Future<void> main() async {
   await authCubit.restoreSession();
 
   runApp(
-    KerjancokApp(
+    KnectApp(
       config: config,
       apiClient: apiClient,
       authRepository: authRepository,
@@ -42,8 +42,8 @@ Future<void> main() async {
   );
 }
 
-class KerjancokApp extends StatefulWidget {
-  const KerjancokApp({
+class KnectApp extends StatefulWidget {
+  const KnectApp({
     required this.config,
     required this.apiClient,
     required this.authRepository,
@@ -57,10 +57,10 @@ class KerjancokApp extends StatefulWidget {
   final AuthCubit authCubit;
 
   @override
-  State<KerjancokApp> createState() => _KerjancokAppState();
+  State<KnectApp> createState() => _KnectAppState();
 }
 
-class _KerjancokAppState extends State<KerjancokApp> {
+class _KnectAppState extends State<KnectApp> {
   late final AppRouter _appRouter;
 
   @override
@@ -85,13 +85,15 @@ class _KerjancokAppState extends State<KerjancokApp> {
         RepositoryProvider.value(value: widget.apiClient),
         RepositoryProvider<AuthRepository>.value(value: widget.authRepository),
         RepositoryProvider(create: (_) => EmployeeRepository(widget.apiClient)),
-        RepositoryProvider(create: (_) => DirectoryRepository(widget.apiClient)),
+        RepositoryProvider(
+            create: (_) => DirectoryRepository(widget.apiClient)),
         RepositoryProvider(
           create: (_) =>
               AttendanceRepository(widget.apiClient, SecureDeviceIdentity()),
         ),
         RepositoryProvider(create: (_) => RequestsRepository(widget.apiClient)),
-        RepositoryProvider(create: (_) => ApprovalsRepository(widget.apiClient)),
+        RepositoryProvider(
+            create: (_) => ApprovalsRepository(widget.apiClient)),
         RepositoryProvider(
           create: (_) => NotificationsRepository(widget.apiClient),
         ),

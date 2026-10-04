@@ -82,7 +82,8 @@ class AttendanceRecord {
         earlyLeaveMinutes = json.intOrNull('earlyLeaveMinutes') ?? 0,
         workMinutes = json.intOrNull('workMinutes'),
         isSuspicious = json['isSuspicious'] == true,
-        anomalies = json.list('anomalies').map(AttendanceAnomaly.fromJson).toList();
+        anomalies =
+            json.list('anomalies').map(AttendanceAnomaly.fromJson).toList();
 
   final String id;
   final String employeeId;

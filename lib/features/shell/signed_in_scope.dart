@@ -50,7 +50,8 @@ class TodayStatus {
     final label = switch (action) {
       ClockAction.clockIn => 'Clock in',
       ClockAction.clockOut => 'Clock out',
-      null when pending == ClockAction.clockIn && state == WindowState.notOpen =>
+      null
+          when pending == ClockAction.clockIn && state == WindowState.notOpen =>
         'Clock-in opens at ${Clock.hm(schedule.clockInOpensAt!, tz)}',
       null when pending == ClockAction.clockIn =>
         'Clock-in closed · request a correction',
@@ -99,10 +100,12 @@ class SignedInScope extends StatelessWidget {
           create: (context) => TodayCubit(context.read<AttendanceRepository>()),
         ),
         BlocProvider(
-          create: (context) => DirectoryCubit(context.read<DirectoryRepository>()),
+          create: (context) =>
+              DirectoryCubit(context.read<DirectoryRepository>()),
         ),
         BlocProvider(
-          create: (context) => RequestsCubit(context.read<RequestsRepository>()),
+          create: (context) =>
+              RequestsCubit(context.read<RequestsRepository>()),
         ),
         BlocProvider(
           create: (context) =>

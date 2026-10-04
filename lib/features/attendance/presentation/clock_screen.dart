@@ -58,7 +58,8 @@ PreferredSizeWidget _stepAppBar(
         ),
         Text(
           'Step $step of 2',
-          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.75)),
+          style: TextStyle(
+              fontSize: 12, color: Colors.white.withValues(alpha: 0.75)),
         ),
       ],
     ),
@@ -94,9 +95,10 @@ class _ScheduleBand extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                [schedule.shiftName ?? 'Shift', schedule.office?.name ?? schedule.officeName]
-                    .whereType<String>()
-                    .join(' · '),
+                [
+                  schedule.shiftName ?? 'Shift',
+                  schedule.office?.name ?? schedule.officeName
+                ].whereType<String>().join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -144,7 +146,8 @@ class _BottomAction extends StatelessWidget {
 enum _LocationProblem { serviceOff, denied, deniedForever, unavailable }
 
 class ClockLocationScreen extends StatefulWidget {
-  const ClockLocationScreen({required this.action, required this.schedule, super.key});
+  const ClockLocationScreen(
+      {required this.action, required this.schedule, super.key});
 
   final ClockAction action;
   final TodaySchedule schedule;
@@ -165,8 +168,8 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
     final position = _position;
     final office = _office;
     if (position == null || office == null) return null;
-    return distanceMeters(
-        position.latitude, position.longitude, office.latitude, office.longitude);
+    return distanceMeters(position.latitude, position.longitude,
+        office.latitude, office.longitude);
   }
 
   @override
@@ -274,7 +277,8 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
     if (record != null && mounted) {
       unawaited(navigator.pushReplacement(
         MaterialPageRoute(
-          builder: (_) => ClockResultScreen(action: widget.action, record: record),
+          builder: (_) =>
+              ClockResultScreen(action: widget.action, record: record),
         ),
         result: true,
       ));
@@ -340,14 +344,17 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
     final colors = Theme.of(context).colorScheme;
     final office = _office;
     final position = _position;
-    final officePoint = office == null ? null : LatLng(office.latitude, office.longitude);
-    final userPoint = position == null ? null : LatLng(position.latitude, position.longitude);
+    final officePoint =
+        office == null ? null : LatLng(office.latitude, office.longitude);
+    final userPoint =
+        position == null ? null : LatLng(position.latitude, position.longitude);
     final center = userPoint ?? officePoint;
     if (center == null) {
       return ColoredBox(
         color: colors.surfaceContainerHigh,
         child: Center(
-          child: Icon(Icons.map_outlined, size: 48, color: colors.onSurfaceVariant),
+          child: Icon(Icons.map_outlined,
+              size: 48, color: colors.onSurfaceVariant),
         ),
       );
     }
@@ -393,7 +400,8 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
               width: 36,
               height: 36,
               alignment: Alignment.topCenter,
-              child: const Icon(Icons.location_on, size: 36, color: BrandColors.deepViolet),
+              child: const Icon(Icons.location_on,
+                  size: 36, color: BrandColors.deepViolet),
             ),
           if (userPoint != null)
             Marker(
@@ -403,7 +411,8 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
               child: _Avatar(initials: initials),
             ),
         ]),
-        const SimpleAttributionWidget(source: Text('OpenStreetMap contributors')),
+        const SimpleAttributionWidget(
+            source: Text('OpenStreetMap contributors')),
       ],
     );
   }
@@ -428,7 +437,8 @@ class _Avatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initials,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -498,9 +508,11 @@ class _LocationStatusCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.location_off_outlined, color: theme.colorScheme.error),
+                Icon(Icons.location_off_outlined,
+                    color: theme.colorScheme.error),
                 const SizedBox(width: 10),
-                Expanded(child: Text(message, style: theme.textTheme.bodyMedium)),
+                Expanded(
+                    child: Text(message, style: theme.textTheme.bodyMedium)),
               ],
             ),
             const SizedBox(height: 8),
@@ -516,7 +528,8 @@ class _LocationStatusCard extends StatelessWidget {
 }
 
 class _LocationSummary extends StatelessWidget {
-  const _LocationSummary({required this.position, required this.distance, required this.office});
+  const _LocationSummary(
+      {required this.position, required this.distance, required this.office});
 
   final Position position;
   final double? distance;
@@ -525,9 +538,11 @@ class _LocationSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final inside = distance != null && office != null && distance! <= office!.radiusMeters;
+    final inside =
+        distance != null && office != null && distance! <= office!.radiusMeters;
     final warnings = [
-      if (position.accuracy > 100) 'Weak GPS signal (±${position.accuracy.round()} m)',
+      if (position.accuracy > 100)
+        'Weak GPS signal (±${position.accuracy.round()} m)',
       if (position.isMocked) 'Mock location detected; this will be flagged',
     ];
     return Card(
@@ -571,7 +586,8 @@ class _LocationSummary extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 6, left: 30),
                 child: Text(
                   warning,
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.tertiary),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.tertiary),
                 ),
               ),
           ],
@@ -594,7 +610,8 @@ class _OutOfRangeResult {
 }
 
 class _OutOfRangeSheet extends StatefulWidget {
-  const _OutOfRangeSheet({required this.action, required this.distance, required this.office});
+  const _OutOfRangeSheet(
+      {required this.action, required this.distance, required this.office});
 
   final ClockAction action;
   final double distance;
@@ -619,10 +636,12 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
     // Clock-out outside the area is accepted and flagged for review; clock-in
     // outside it is rejected by the API.
     final canContinue = widget.action == ClockAction.clockOut;
-    final where = '${formatDistance(widget.distance)} from ${widget.office.name}';
+    final where =
+        '${formatDistance(widget.distance)} from ${widget.office.name}';
     final radius = formatDistance(widget.office.radiusMeters);
     return Padding(
-      padding: EdgeInsets.fromLTRB(24, 0, 24, 16 + MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.fromLTRB(
+          24, 0, 24, 16 + MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -636,7 +655,8 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
                   tooltip: 'Close',
                 ),
                 const SizedBox(width: 4),
-                Text('You are out of range', style: theme.textTheme.titleMedium),
+                Text('You are out of range',
+                    style: theme.textTheme.titleMedium),
               ],
             ),
             const SizedBox(height: 12),
@@ -648,7 +668,8 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
                   color: theme.colorScheme.errorContainer,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.wrong_location_outlined, size: 48, color: theme.colorScheme.error),
+                child: Icon(Icons.wrong_location_outlined,
+                    size: 48, color: theme.colorScheme.error),
               ),
             ),
             const SizedBox(height: 16),
@@ -682,18 +703,21 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
               FilledButton(
                 onPressed: _note.text.trim().isEmpty
                     ? null
-                    : () => Navigator.pop(context, _OutOfRangeResult.proceed(_note.text.trim())),
+                    : () => Navigator.pop(
+                        context, _OutOfRangeResult.proceed(_note.text.trim())),
                 child: const Text('Continue clock out'),
               )
             else
               FilledButton(
-                onPressed: () => Navigator.pop(context, const _OutOfRangeResult.recheck()),
+                onPressed: () =>
+                    Navigator.pop(context, const _OutOfRangeResult.recheck()),
                 child: const Text('Recheck location'),
               ),
             if (canContinue) ...[
               const SizedBox(height: 4),
               TextButton(
-                onPressed: () => Navigator.pop(context, const _OutOfRangeResult.recheck()),
+                onPressed: () =>
+                    Navigator.pop(context, const _OutOfRangeResult.recheck()),
                 child: const Text('Recheck location'),
               ),
             ],
@@ -805,7 +829,8 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
       setState(() => _failure = const ApiFailure(
             kind: ApiFailureKind.unknown,
             code: 'NOTE_REQUIRED',
-            message: 'Add a note explaining why you are outside the office area.',
+            message:
+                'Add a note explaining why you are outside the office area.',
           ));
       return;
     }
@@ -863,7 +888,8 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
                 Positioned.fill(child: _preview(context)),
                 if (_camera != null)
                   const Positioned.fill(
-                    child: IgnorePointer(child: CustomPaint(painter: _FaceGuidePainter())),
+                    child: IgnorePointer(
+                        child: CustomPaint(painter: _FaceGuidePainter())),
                   ),
               ],
             ),
@@ -903,7 +929,8 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
                             children: [
                               const SizedBox.square(
                                 dimension: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               ),
                               const SizedBox(width: 12),
                               Text(_phase!),
@@ -950,7 +977,8 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.no_photography_outlined, color: Colors.white, size: 40),
+                    const Icon(Icons.no_photography_outlined,
+                        color: Colors.white, size: 40),
                     const SizedBox(height: 12),
                     Text(
                       error,
@@ -970,7 +998,8 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
                           child: const Text('Try again'),
                         ),
                         TextButton(
-                          style: TextButton.styleFrom(foregroundColor: Colors.white),
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.white),
                           onPressed: Geolocator.openAppSettings,
                           child: const Text('App settings'),
                         ),
@@ -1055,7 +1084,8 @@ class _FailureText extends StatelessWidget {
 
 /// Confirmation after a successful clock action.
 class ClockResultScreen extends StatelessWidget {
-  const ClockResultScreen({required this.action, required this.record, super.key});
+  const ClockResultScreen(
+      {required this.action, required this.record, super.key});
 
   final ClockAction action;
   final AttendanceRecord record;
@@ -1066,7 +1096,8 @@ class ClockResultScreen extends StatelessWidget {
     final colors = theme.colorScheme;
     final clockIn = action == ClockAction.clockIn;
     final at = clockIn ? record.clockInAt : record.clockOutAt;
-    final distance = clockIn ? record.clockInDistanceM : record.clockOutDistanceM;
+    final distance =
+        clockIn ? record.clockInDistanceM : record.clockOutDistanceM;
     final outside = !clockIn && record.clockOutLocationValid == false;
 
     final (tone, statusLabel) = clockIn
@@ -1074,7 +1105,10 @@ class ClockResultScreen extends StatelessWidget {
             ? (StatusTone.warning, 'Late ${Clock.duration(record.lateMinutes)}')
             : (StatusTone.success, 'On time')
         : record.earlyLeaveMinutes > 0
-            ? (StatusTone.warning, 'Left ${Clock.duration(record.earlyLeaveMinutes)} early')
+            ? (
+                StatusTone.warning,
+                'Left ${Clock.duration(record.earlyLeaveMinutes)} early'
+              )
             : (StatusTone.success, 'Shift complete');
 
     return Scaffold(
@@ -1087,12 +1121,14 @@ class ClockResultScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 40,
                 backgroundColor: colors.primaryContainer,
-                child: Icon(Icons.check_rounded, size: 44, color: colors.onPrimaryContainer),
+                child: Icon(Icons.check_rounded,
+                    size: 44, color: colors.onPrimaryContainer),
               ),
               const SizedBox(height: 20),
               Text(
                 clockIn ? 'You are clocked in' : 'You are clocked out',
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 6),
               Text(
@@ -1102,7 +1138,8 @@ class ClockResultScreen extends StatelessWidget {
                     // business date can be the day before.
                     : '${Clock.hm(at, record.timezone)} · '
                         '${Clock.date(Clock.toZone(at, record.timezone))}',
-                style: theme.textTheme.bodyLarge?.copyWith(color: colors.onSurfaceVariant),
+                style: theme.textTheme.bodyLarge
+                    ?.copyWith(color: colors.onSurfaceVariant),
               ),
               const SizedBox(height: 14),
               StatusChip(statusLabel, tone: tone),
@@ -1131,7 +1168,8 @@ class ClockResultScreen extends StatelessWidget {
                       ),
                     for (final anomaly in record.anomalies)
                       ListTile(
-                        leading: Icon(Icons.flag_outlined, color: colors.tertiary),
+                        leading:
+                            Icon(Icons.flag_outlined, color: colors.tertiary),
                         title: const Text('Flagged for review'),
                         subtitle: Text(anomaly.description ?? anomaly.type),
                       ),

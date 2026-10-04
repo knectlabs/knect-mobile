@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/async/async_value.dart';
+import '../../../core/routing/app_router.dart';
 import '../../../core/time/format.dart';
+import '../../../shared/widgets/navigation.dart';
+import '../../approvals/presentation/approvals_screen.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../auth/application/auth_cubit.dart';
 import '../data/notifications_repository.dart';
@@ -55,17 +59,20 @@ class NotificationsList extends StatelessWidget {
                         EmptyView(
                           icon: Icons.notifications_none,
                           title: 'No notifications',
-                          message: 'Updates on your requests and approvals appear here.',
+                          message:
+                              'Updates on your requests and approvals appear here.',
                         ),
                       ],
                     )
                   : ListView.separated(
                       itemCount: notifications.length + 1,
-                      separatorBuilder: (_, index) =>
-                          index == 0 ? const SizedBox.shrink() : const Divider(height: 1, indent: 72),
+                      separatorBuilder: (_, index) => index == 0
+                          ? const SizedBox.shrink()
+                          : const Divider(height: 1, indent: 72),
                       itemBuilder: (context, index) {
                         if (index == 0) {
-                          final unread = notifications.any((item) => item.unread);
+                          final unread =
+                              notifications.any((item) => item.unread);
                           return Align(
                             alignment: Alignment.centerRight,
                             child: Padding(
@@ -77,7 +84,11 @@ class NotificationsList extends StatelessWidget {
                             ),
                           );
                         }
-                        return _NotificationTile(notification: notifications[index - 1]);
+                        return _NotificationTile(
+                          notification: notifications[index - 1],
+                          onOpen: (notification) =>
+                              _openNotification(context, cubit, notification),
+                        );
                       },
                     ),
             ),
@@ -86,12 +97,28 @@ class NotificationsList extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _openNotification(
+    BuildContext context,
+    _NotificationsCubit cubit,
+    AppNotification notification,
+  ) async {
+    await cubit.markRead(notification);
+    if (!context.mounted || notification.target == null) return;
+
+    if (notification.type == 'APPROVAL_REQUESTED') {
+      await pushPage(context, const ApprovalsScreen());
+      return;
+    }
+    context.go(AppRoutes.requests);
+  }
 }
 
 class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({required this.notification});
+  const _NotificationTile({required this.notification, required this.onOpen});
 
   final AppNotification notification;
+  final ValueChanged<AppNotification> onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +137,7 @@ class _NotificationTile extends StatelessWidget {
                 ? (Icons.pending_actions, const Color(0xFFF59E0B))
                 : (Icons.notifications, colors.primary);
     return InkWell(
-      onTap: () => context.read<_NotificationsCubit>().markRead(notification),
+      onTap: () => onOpen(notification),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
         child: Row(
@@ -133,14 +160,16 @@ class _NotificationTile extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
                         notification.message,
-                        style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: colors.onSurfaceVariant),
                       ),
                     ),
                   const SizedBox(height: 4),
                   Text(
                     '${Clock.shortDate(Clock.toZone(notification.createdAt, tz))} · '
                     '${Clock.hm(notification.createdAt, tz)}',
-                    style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: colors.onSurfaceVariant),
                   ),
                 ],
               ),

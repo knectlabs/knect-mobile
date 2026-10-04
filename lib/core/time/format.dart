@@ -10,15 +10,27 @@ abstract final class Clock {
   };
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   static const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   /// Offset of an IANA zone; falls back to the device offset.
   static Duration offsetOf(String? timezone) {
     final hours = _offsets[timezone];
-    return hours == null ? DateTime.now().timeZoneOffset : Duration(hours: hours);
+    return hours == null
+        ? DateTime.now().timeZoneOffset
+        : Duration(hours: hours);
   }
 
   /// Wall-clock representation of [instant] in [timezone] (as a UTC DateTime).
@@ -26,7 +38,8 @@ abstract final class Clock {
       instant.toUtc().add(offsetOf(timezone));
 
   /// UTC instant of a local [date] + [hour]:[minute] in [timezone].
-  static DateTime fromZone(DateTime date, int hour, int minute, String? timezone) =>
+  static DateTime fromZone(
+          DateTime date, int hour, int minute, String? timezone) =>
       DateTime.utc(date.year, date.month, date.day, hour, minute)
           .subtract(offsetOf(timezone));
 

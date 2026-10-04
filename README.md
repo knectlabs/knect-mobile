@@ -1,6 +1,6 @@
 # Knect Mobile (codename Kerjancok)
 
-Flutter employee self-service app for Kerjancok.
+Flutter employee self-service app for Knect.
 
 ## Local setup
 
@@ -26,7 +26,7 @@ the shared `ApiClient`.
 | `API_BASE_URL` | absolute URL ending in `/api/v1`        | Required and HTTPS-only outside development |
 
 Development defaults to `http://10.0.2.2:3000/api/v1`, the Android emulator
-alias for the host machine running `kerjancok-api`. Debug Android builds allow
+alias for the host machine running the Knect API repository. Debug Android builds allow
 cleartext HTTP for this purpose; release builds do not. On the iOS simulator or
 a physical device, pass a reachable URL:
 
@@ -93,8 +93,8 @@ an unexpected API.
 - **Sign-out:** sign out of this device (`/auth/logout`, best effort), or sign
   out of all devices (`/auth/logout-all`). Signing out of all devices fails
   visibly when offline.
-- **Navigation:** the tabs are Home and Profile. Attendance, Requests, and
-  Payroll join as their phases ship.
+- **Navigation:** Home, Employees, Request, Inbox, and Account are the main
+  tabs. Live Attendance and the manager approval list open from focused actions.
 - **Not yet:** forgot or reset password (needs email delivery on the API).
   The login screen points users to HR.
 
@@ -111,21 +111,18 @@ flutter test
 flutter build apk --debug
 ```
 
-## Planned features
+## Current features
 
 - Login with JWT access + refresh token
-- Home / today status
-- Clock in / clock out
-- GPS + server-side geofence validation
-- Selfie attendance evidence
-- Attendance history
-- Shift schedule
-- Leave / sick / overtime request
-- Approval inbox for managers
+- Today status, attendance, GPS checks, selfie evidence, and attendance history
+- Leave, overtime, and attendance-correction requests
+- Manager approval inbox and in-app notifications
+- Employee directory and self profile
+
+## Planned features
+
 - Payslip
 - KPI / performance
-- Notifications
-- Profile
 
 ## Architecture direction
 

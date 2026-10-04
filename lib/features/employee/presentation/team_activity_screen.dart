@@ -19,7 +19,8 @@ class TeamActivityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timezone = context.read<AuthCubit>().state.user?.organization.timezone;
+    final timezone =
+        context.read<AuthCubit>().state.user?.organization.timezone;
     final today = Clock.iso(Clock.today(timezone));
     return BlocProvider(
       create: (context) => LoadCubit<List<AttendanceRecord>>(
@@ -47,7 +48,8 @@ class TeamActivityScreen extends StatelessWidget {
                         ),
                       ),
                       for (final person in reports) ...[
-                        _ReportTile(person: person, record: byEmployee[person.id]),
+                        _ReportTile(
+                            person: person, record: byEmployee[person.id]),
                         const Divider(height: 1, indent: 76),
                       ],
                     ],
@@ -77,7 +79,10 @@ class _ReportTile extends StatelessWidget {
         : record?.clockInAt == null
             ? ('Not clocked in', StatusTone.neutral)
             : record!.lateMinutes > 0
-                ? ('Late ${Clock.duration(record.lateMinutes)}', StatusTone.warning)
+                ? (
+                    'Late ${Clock.duration(record.lateMinutes)}',
+                    StatusTone.warning
+                  )
                 : ('On time', StatusTone.success);
     String time(DateTime? value) =>
         value == null ? '--:--' : Clock.hm(value, record?.timezone);

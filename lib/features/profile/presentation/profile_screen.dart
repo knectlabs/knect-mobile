@@ -120,15 +120,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   label: 'Employment Info',
                   onTap: () => open('Employment Info', [
                     (Icons.work_outline, 'Position', profile.position?.name),
-                    (Icons.groups_outlined, 'Department', profile.department?.name),
+                    (
+                      Icons.groups_outlined,
+                      'Department',
+                      profile.department?.name
+                    ),
                     (Icons.place_outlined, 'Office', profile.office?.name),
                     (
                       Icons.supervisor_account_outlined,
                       'Manager',
                       profile.manager?.name
                     ),
-                    (Icons.event_outlined, 'Join date', Clock.date(profile.joinDate)),
-                    (Icons.verified_outlined, 'Status', _status(profile.status)),
+                    (
+                      Icons.event_outlined,
+                      'Join date',
+                      Clock.date(profile.joinDate)
+                    ),
+                    (
+                      Icons.verified_outlined,
+                      'Status',
+                      _status(profile.status)
+                    ),
                   ]),
                 ),
                 _MenuTile(
@@ -136,8 +148,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: const Color(0xFFDC2626),
                   label: 'Emergency Contact Info',
                   onTap: () => open('Emergency Contact Info', [
-                    (Icons.person_outline, 'Name', profile.emergencyContactName),
-                    (Icons.phone_outlined, 'Phone', profile.emergencyContactPhone),
+                    (
+                      Icons.person_outline,
+                      'Name',
+                      profile.emergencyContactName
+                    ),
+                    (
+                      Icons.phone_outlined,
+                      'Phone',
+                      profile.emergencyContactPhone
+                    ),
                   ]),
                 ),
               ],
@@ -213,7 +233,8 @@ class _AccountHeader extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(role.isEmpty ? (user?.role.label ?? '') : role, style: muted),
+                Text(role.isEmpty ? (user?.role.label ?? '') : role,
+                    style: muted),
                 if (user != null) Text(user!.organization.name, style: muted),
               ],
             ),
@@ -308,7 +329,8 @@ class _InfoPage extends StatelessWidget {
             subtitle: Text(
               value ?? 'Not set',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: value == null ? theme.colorScheme.onSurfaceVariant : null,
+                color:
+                    value == null ? theme.colorScheme.onSurfaceVariant : null,
               ),
             ),
           );

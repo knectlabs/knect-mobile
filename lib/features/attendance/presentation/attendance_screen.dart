@@ -26,7 +26,8 @@ class AttendanceScreen extends StatelessWidget {
     final state = context.watch<TodayCubit>().state;
     final today = state.valueOrPrevious;
     final timezone = today?.schedule.timezone ??
-        context.select((AuthCubit auth) => auth.state.user?.organization.timezone);
+        context
+            .select((AuthCubit auth) => auth.state.user?.organization.timezone);
     final theme = Theme.of(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -42,7 +43,8 @@ class AttendanceScreen extends StatelessWidget {
                   // Header extends behind the top of the schedule card.
                   Container(
                     height: 290 + MediaQuery.paddingOf(context).top,
-                    decoration: const BoxDecoration(gradient: BrandColors.brandGradient),
+                    decoration: const BoxDecoration(
+                        gradient: BrandColors.brandGradient),
                   ),
                   SafeArea(
                     bottom: false,
@@ -88,11 +90,13 @@ class AttendanceScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text('Attendance log', style: theme.textTheme.titleMedium),
+                      child: Text('Attendance log',
+                          style: theme.textTheme.titleMedium),
                     ),
                     TextButton(
                       key: const Key('attendance.viewLog'),
-                      onPressed: () => pushPage(context, const AttendanceLogScreen()),
+                      onPressed: () =>
+                          pushPage(context, const AttendanceLogScreen()),
                       child: const Text('View log'),
                     ),
                   ],
@@ -187,7 +191,8 @@ class _ScheduleCard extends StatelessWidget {
                 ),
               ],
             )
-          : const SizedBox(height: 160, child: Center(child: CircularProgressIndicator()));
+          : const SizedBox(
+              height: 160, child: Center(child: CircularProgressIndicator()));
     } else {
       final schedule = today.schedule;
       final tz = schedule.timezone;
@@ -202,7 +207,8 @@ class _ScheduleCard extends StatelessWidget {
           if (schedule.scheduled) ...[
             Text(
               schedule.shiftName ?? 'Shift',
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
             Text(
               '${Clock.hm(schedule.startsAt!, tz)} - ${Clock.hm(schedule.endsAt!, tz)}',
@@ -221,7 +227,8 @@ class _ScheduleCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.45),
+                color:
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.45),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -268,7 +275,8 @@ class _ScheduleCard extends StatelessWidget {
           ] else ...[
             Text(
               'No shift today',
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
             Text('Enjoy your day off.', style: muted),
@@ -322,7 +330,8 @@ class _TodayLog extends StatelessWidget {
         time: Clock.hm(record.clockInAt!, tz),
         event: 'Clock In',
         detail: [
-          if (record.lateMinutes > 0) 'Late ${Clock.duration(record.lateMinutes)}',
+          if (record.lateMinutes > 0)
+            'Late ${Clock.duration(record.lateMinutes)}',
           if (record.clockInDistanceM != null)
             '${formatDistance(record.clockInDistanceM!)} from office',
         ].join(' · '),
@@ -431,8 +440,10 @@ class AttendanceLogScreen extends StatelessWidget {
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         itemCount: records.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1, indent: 16),
-                        itemBuilder: (_, index) => _HistoryTile(record: records[index]),
+                        separatorBuilder: (_, __) =>
+                            const Divider(height: 1, indent: 16),
+                        itemBuilder: (_, index) =>
+                            _HistoryTile(record: records[index]),
                       ),
               ),
             ),
@@ -455,7 +466,10 @@ class _HistoryTile extends StatelessWidget {
         value == null ? '--:--' : Clock.hm(value, record.timezone);
     final (label, tone) = switch (record.status) {
       'PRESENT' => ('Present', StatusTone.success),
-      'LATE' => ('Late ${Clock.duration(record.lateMinutes)}', StatusTone.warning),
+      'LATE' => (
+          'Late ${Clock.duration(record.lateMinutes)}',
+          StatusTone.warning
+        ),
       'ABSENT' => ('Absent', StatusTone.danger),
       'LEAVE' => ('Leave', StatusTone.neutral),
       'SICK' => ('Sick', StatusTone.neutral),
@@ -483,7 +497,8 @@ class _HistoryTile extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 'Under review',
-                style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.tertiary),
+                style: theme.textTheme.labelSmall
+                    ?.copyWith(color: theme.colorScheme.tertiary),
               ),
             ),
         ],
