@@ -1,4 +1,4 @@
-# Kerjancok — Development Roadmap
+# Knect — Development Roadmap
 
 This roadmap is ordered by dependency, not by visual importance.
 
@@ -62,7 +62,7 @@ and its API/database exit criteria are complete.
 Mobile progress (2026-10-03): the Flutter application has reproducible Android
 and iOS platform projects, lint configuration, dependency locking, and widget
 tests. `go_router` guards routes by session state (signed-out users reach only
-`/login`). A shared Material 3 theme uses the Kerjancok brand green. A Dio
+`/login`). A shared Material 3 theme uses the Knect brand green. A Dio
 `ApiClient` attaches the stored access token and maps failures to `ApiFailure`
 using the documented error envelope. Tokens live only in
 `flutter_secure_storage`. `AppConfig` reads `APP_ENV` / `API_BASE_URL` from
@@ -81,7 +81,7 @@ logout API calls are Phase 1A; see the mobile `README.md`.
 - [x] UI primitives
 
 Admin progress (2026-10-03): Next.js 16 (App Router, TypeScript, Tailwind CSS
-v4, shadcn/ui) with Kerjancok design tokens for light and dark themes. The
+v4, shadcn/ui) with Knect design tokens for light and dark themes. The
 layout shell follows the PRD admin navigation, and sections become links when
 their phase ships. Sessions are held server-side in httpOnly cookies, and the
 browser never sees tokens. `src/proxy.ts` performs an optimistic redirect, and

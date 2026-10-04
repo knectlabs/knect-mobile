@@ -1,10 +1,10 @@
-# Kerjancok — AI Development Instructions
+# Knect — AI Development Instructions
 
 ## 1. Project
 
-You are working on **Kerjancok**, a modern HRIS / workforce-management platform for Indonesian companies.
+You are working on **Knect**, a modern HRIS / workforce-management platform for Indonesian companies.
 
-Kerjancok is inspired by mature HRIS products such as **Mekari Talenta**, but it is an independent product.
+Knect is inspired by mature HRIS products such as **Mekari Talenta**, but it is an independent product.
 
 Mekari Talenta is the primary UX/design reference.
 
@@ -21,18 +21,18 @@ Use Talenta as inspiration for:
 - payroll / payslip presentation
 - HR dashboard organization
 
-Kerjancok must keep its own visual identity.
+Knect must keep its own visual identity.
 
 ---
 
 # 2. Repositories
 
-Kerjancok intentionally uses separate repositories.
+Knect intentionally uses separate repositories.
 
 ```text
-kerjancok-api
-kerjancok-mobile
-kerjancok-admin
+knect-api
+knect-mobile
+knect-admin
 ```
 
 Do not convert this project into a monorepo.
@@ -984,7 +984,7 @@ After coding:
 
 Do not optimize only for making the current task pass.
 
-Optimize for keeping **Kerjancok internally consistent over the entire product roadmap**.
+Optimize for keeping **Knect internally consistent over the entire product roadmap**.
 
 When in doubt:
 

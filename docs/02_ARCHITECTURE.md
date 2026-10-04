@@ -1,4 +1,4 @@
-# Kerjancok — System Architecture
+# Knect — System Architecture
 
 ## 1. High-Level Architecture
 
@@ -20,7 +20,7 @@ flowchart LR
 
 # 2. Repository Boundaries
 
-## kerjancok-api
+## knect-api
 
 Owns:
 - business rules
@@ -33,7 +33,7 @@ Owns:
 - auditing
 - API contract
 
-## kerjancok-mobile
+## knect-mobile
 
 Owns:
 - employee UX
@@ -49,7 +49,7 @@ Must not own:
 - payroll calculation
 - leave balance truth
 
-## kerjancok-admin
+## knect-admin
 
 Owns:
 - HR/admin workflows

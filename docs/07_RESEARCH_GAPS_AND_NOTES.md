@@ -1,4 +1,4 @@
-# Kerjancok — Research Gap Notes & Long-Term Backlog
+# Knect — Research Gap Notes & Long-Term Backlog
 
 > This file records important features discovered during the initial research phase that are not yet fully modeled or implemented.
 >
@@ -24,7 +24,7 @@ Use Mekari Talenta as inspiration for:
 
 Do not create a pixel-perfect clone.
 
-Kerjancok should have its own:
+Knect should have its own:
 
 - visual identity
 - typography
@@ -37,7 +37,7 @@ Kerjancok should have its own:
 
 The goal is:
 
-> familiar HRIS UX, distinct Kerjancok product identity.
+> familiar HRIS UX, distinct Knect product identity.
 
 ---
 

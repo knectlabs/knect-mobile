@@ -1,4 +1,4 @@
-# Kerjancok — Architecture Decision Log
+# Knect — Architecture Decision Log
 
 This file overrides older planning documents when decisions conflict.
 
@@ -8,11 +8,11 @@ This file overrides older planning documents when decisions conflict.
 
 **Status:** Accepted
 
-Kerjancok uses separate repositories.
+Knect uses separate repositories.
 
-- `kerjancok-api`
-- `kerjancok-mobile`
-- `kerjancok-admin`
+- `knect-api`
+- `knect-mobile`
+- `knect-admin`
 
 Reason:
 - user explicitly does not want a monorepo
@@ -68,9 +68,9 @@ Reason:
 
 **Status:** Accepted
 
-Supabase is not part of Kerjancok architecture.
+Supabase is not part of Knect architecture.
 
-Authentication and business logic are owned by Kerjancok API.
+Authentication and business logic are owned by Knect API.
 
 ---
 
@@ -203,10 +203,9 @@ Revisit when platform-level tenant management (SUPER_ADMIN) is designed.
 
 **Status:** Accepted (2026-10-03)
 
-The product is presented to customers as **Knect**: app name, launcher
-label, logo, and in-app copy. "Kerjancok" remains the internal codename for
-repositories, packages, and the bundle id (`com.kerjancok.*`), and in
-engineering docs.
+The product and engineering identifiers use **Knect**: app name, launcher
+label, logo, in-app copy, repositories, packages, bundle ids
+(`com.knect.*`), and engineering documentation.
 
 Brand palette (from the app icon and wordmark):
 

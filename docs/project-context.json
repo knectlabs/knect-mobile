@@ -1,5 +1,5 @@
 {
-  "project": "Kerjancok",
+  "project": "Knect",
   "document_version": "2.0",
   "source_of_truth_order": [
     "05_DECISIONS.md",
@@ -11,9 +11,9 @@
     "06_API_CONVENTIONS.md"
   ],
   "repositories": {
-    "api": "kerjancok-api",
-    "mobile": "kerjancok-mobile",
-    "admin": "kerjancok-admin"
+    "api": "knect-api",
+    "mobile": "knect-mobile",
+    "admin": "knect-admin"
   },
   "stack": {
     "mobile": "Flutter",

@@ -1,4 +1,4 @@
-# Kerjancok — Product Requirements Document
+# Knect — Product Requirements Document
 
 ## Document Status
 
@@ -24,7 +24,7 @@ Common problems:
 - HR reporting requires manual consolidation
 - employee self-service is limited
 
-Kerjancok aims to centralize these workflows in one HRIS.
+Knect aims to centralize these workflows in one HRIS.
 
 ---
 

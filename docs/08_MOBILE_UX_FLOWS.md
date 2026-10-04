@@ -1,4 +1,4 @@
-# Kerjancok — Mobile UX Flow Notes
+# Knect — Mobile UX Flow Notes
 
 Primary UI reference: **Mekari Talenta**, visually differentiated.
 
@@ -10,7 +10,7 @@ Secondary interaction references:
 
 Use familiar HRIS patterns but do not copy pixel-for-pixel.
 
-Kerjancok should feel:
+Knect should feel:
 - modern
 - clean
 - enterprise-ready

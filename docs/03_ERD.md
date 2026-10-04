@@ -1,4 +1,4 @@
-# Kerjancok — Database ERD
+# Knect — Database ERD
 
 > Mermaid ER diagrams are intentionally included in Markdown so AI tools and humans can parse the data model without image OCR.
 

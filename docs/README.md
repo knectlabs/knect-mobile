@@ -1,6 +1,6 @@
-# Kerjancok — AI Project Context
+# Knect — AI Project Context
 
-This folder is the long-term source of truth for the Kerjancok HRIS project.
+This folder is the long-term source of truth for the Knect HRIS project.
 
 ## Purpose
 
@@ -43,12 +43,12 @@ Never silently change product architecture or database semantics. Update the rel
 
 ## Repositories
 
-Kerjancok is intentionally **not a monorepo**.
+Knect is intentionally **not a monorepo**.
 
 Repositories:
 
-- `kerjancok-api` — NestJS API
-- `kerjancok-mobile` — Flutter mobile application
-- `kerjancok-admin` — Next.js HR/admin dashboard
+- `knect-api` — NestJS API
+- `knect-mobile` — Flutter mobile application
+- `knect-admin` — Next.js HR/admin dashboard
 
 All repositories should keep a copy or link to the latest AI context documents.

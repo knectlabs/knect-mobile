@@ -1,14 +1,14 @@
-# Kerjancok — Master AI Project Context
+# Knect — Master AI Project Context
 
 > This file is the first document an AI coding agent must read before making implementation decisions.
 
 ## 1. Product Identity
 
-**Product name:** Kerjancok
+**Product name:** Knect
 
 **Product type:** Modern HRIS / workforce management platform for Indonesian companies.
 
-Kerjancok is inspired by mature HR products such as Mekari Talenta, but it is an independent implementation.
+Knect is inspired by mature HR products such as Mekari Talenta, but it is an independent implementation.
 
 The platform focuses on:
 
@@ -35,13 +35,13 @@ The product must be designed as a real SaaS-style HRIS, not as a simple attendan
 
 # 2. Repository Strategy
 
-Kerjancok uses **three independent repositories**.
+Knect uses **three independent repositories**.
 
 ## Backend
 
 Repository:
 
-`kerjancok-api`
+`knect-api`
 
 Stack:
 
@@ -65,7 +65,7 @@ Potential later infrastructure:
 
 Repository:
 
-`kerjancok-mobile`
+`knect-mobile`
 
 Stack:
 
@@ -87,7 +87,7 @@ Primary users:
 
 Repository:
 
-`kerjancok-admin`
+`knect-admin`
 
 Stack:
 
@@ -448,7 +448,7 @@ Primary product design reference:
 
 **Mekari Talenta**
 
-Kerjancok should use Mekari Talenta as a reference for:
+Knect should use Mekari Talenta as a reference for:
 
 - information hierarchy
 - HR dashboard structure
@@ -459,15 +459,15 @@ Kerjancok should use Mekari Talenta as a reference for:
 - HR/admin data-management patterns
 - overall enterprise HRIS usability
 
-Kerjancok must **not** be a pixel-perfect copy.
+Knect must **not** be a pixel-perfect copy.
 
 Design direction:
 
 - preserve familiar HRIS interaction patterns
 - change visual identity, spacing, component styling, typography, iconography, and layout details
-- keep Kerjancok visually distinct
+- keep Knect visually distinct
 - prioritize clarity and usability over visual imitation
 - mobile UX may also borrow interaction ideas from `qyupaww/flutter-hris` and Horilla HR Mobile
-- architecture and business rules come from Kerjancok's own source-of-truth documents, not from any external UI
+- architecture and business rules come from Knect's own source-of-truth documents, not from any external UI
 
 When an AI generates UI, it should treat Mekari Talenta as a **design reference**, not as a cloning target.

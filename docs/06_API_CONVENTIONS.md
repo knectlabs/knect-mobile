@@ -1,4 +1,4 @@
-# Kerjancok — API Conventions
+# Knect — API Conventions
 
 Base path:
 
