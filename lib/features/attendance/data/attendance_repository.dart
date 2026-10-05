@@ -173,6 +173,9 @@ class AttendanceRepository {
     ClockPosition position, {
     String? selfieUrl,
     String? note,
+    List<double>? faceEmbedding,
+    String? faceModelId,
+    double? faceSimilarity,
   }) async {
     final device = await _device.current();
     final path = action == ClockAction.clockIn
@@ -186,6 +189,11 @@ class AttendanceRepository {
       'deviceIdentifier': device.identifier,
       if (selfieUrl != null) 'selfieUrl': selfieUrl,
       if (note != null && note.isNotEmpty) 'note': note,
+      // The server re-decides the match; the embedding is a biometric secret
+      // (never logged). faceSimilarity is UX-only and ignored server-side.
+      if (faceEmbedding != null) 'faceEmbedding': faceEmbedding,
+      if (faceModelId != null) 'faceModelId': faceModelId,
+      if (faceSimilarity != null) 'faceSimilarity': faceSimilarity,
     });
     return AttendanceRecord.fromJson(data(response));
   }

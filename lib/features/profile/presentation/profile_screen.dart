@@ -11,6 +11,7 @@ import '../../shell/signed_in_scope.dart';
 import '../../../shared/widgets/initials_avatar.dart';
 import '../../../shared/widgets/large_title.dart';
 import '../../../shared/widgets/navigation.dart';
+import '../../face/presentation/face_enrollment_screen.dart';
 
 /// Account tab: who the user is, their employee info, and sign-out.
 class ProfileScreen extends StatefulWidget {
@@ -162,6 +163,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
               const _SectionTitle('Settings'),
+              _MenuTile(
+                icon: Icons.face_retouching_natural,
+                color: const Color(0xFF0EA5E9),
+                label: 'Face verification',
+                onTap: () => pushPage(context, const FaceEnrollmentPage()),
+              ),
               _MenuTile(
                 key: const Key('profile.signOut'),
                 icon: Icons.logout,

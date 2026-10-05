@@ -17,6 +17,7 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/time/format.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../auth/application/auth_cubit.dart';
+import '../../face/data/face_embedder.dart';
 import '../../shell/signed_in_scope.dart';
 import '../data/attendance_repository.dart';
 
@@ -755,6 +756,7 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
   CameraController? _camera;
   String? _cameraError;
   late final _note = TextEditingController(text: widget.outsideNote);
+  final _faceEmbedder = MlKitFaceEmbedder();
   String? _phase;
   ApiFailure? _failure;
 
@@ -772,6 +774,7 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
     WidgetsBinding.instance.removeObserver(this);
     _camera?.dispose();
     _note.dispose();
+    unawaited(_faceEmbedder.dispose());
     super.dispose();
   }
 
@@ -840,8 +843,28 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
       _failure = null;
       _phase = 'Taking photo…';
     });
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final photo = await camera.takePicture();
+      // Detection + crop only (no liveness). The server makes the final 1:1
+      // match decision; the embedding vector is a biometric secret and is
+      // never logged. If no face is detected, submission still proceeds.
+      if (mounted) setState(() => _phase = 'Checking face…');
+      FaceEmbedding? face;
+      try {
+        face = await _faceEmbedder.detectAndEmbed(photo.path);
+      } catch (_) {
+        // Detection failure must not block attendance; proceed without a face.
+        face = null;
+      }
+      if (face == null && mounted) {
+        messenger.showSnackBar(const SnackBar(
+          content: Text(
+            'No face detected. Clocking in without face verification.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
       if (mounted) setState(() => _phase = 'Uploading selfie…');
       final selfieUrl = await repository.uploadImage(photo.path);
       if (mounted) setState(() => _phase = 'Recording attendance…');
@@ -856,6 +879,8 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
         ),
         selfieUrl: selfieUrl,
         note: note,
+        faceEmbedding: face?.vector,
+        faceModelId: face?.modelId,
       );
       navigator.pop(record);
     } catch (error) {

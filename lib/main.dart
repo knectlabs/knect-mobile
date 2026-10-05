@@ -19,6 +19,7 @@ import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/employee/data/directory_repository.dart';
 import 'features/employee/data/employee_repository.dart';
+import 'features/face/data/face_repository.dart';
 import 'features/notifications/data/notifications_repository.dart';
 import 'features/payroll/data/payslip_repository.dart';
 import 'features/performance/data/performance_repository.dart';
@@ -131,6 +132,7 @@ class _KnectAppState extends State<KnectApp> {
         RepositoryProvider(create: (_) => PayslipRepository(widget.apiClient)),
         RepositoryProvider(
             create: (_) => ReimbursementRepository(widget.apiClient)),
+        RepositoryProvider(create: (_) => FaceRepository(widget.apiClient)),
         RepositoryProvider(
             create: (_) => PerformanceRepository(widget.apiClient)),
       ],
