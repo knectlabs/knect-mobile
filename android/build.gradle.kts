@@ -1,7 +1,28 @@
+import com.android.build.gradle.LibraryExtension
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// Some Flutter plugins (e.g. tflite_flutter) pin their Android library module's
+// Java compatibility to 1.8, while the Kotlin compile task the toolchain injects
+// defaults to the JDK running Gradle (21). Gradle rejects that pairing as
+// "Inconsistent JVM-target compatibility". Hook the Android Library plugin as
+// it is applied to each subproject — before AGP locks compileOptions — and
+// raise Java compatibility to 17 so it matches the Kotlin target. This runs on
+// every build, so it survives `flutter pub get` refreshing the plugin cache.
+// (The app module already targets 17.)
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure(LibraryExtension::class.java) {
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+        }
     }
 }
 
