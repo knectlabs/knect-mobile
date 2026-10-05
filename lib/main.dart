@@ -22,6 +22,7 @@ import 'features/employee/data/employee_repository.dart';
 import 'features/notifications/data/notifications_repository.dart';
 import 'features/payroll/data/payslip_repository.dart';
 import 'features/performance/data/performance_repository.dart';
+import 'features/reimbursement/data/reimbursement_repository.dart';
 import 'features/requests/data/requests_repository.dart';
 import 'features/shell/signed_in_scope.dart';
 import 'firebase_options.dart';
@@ -128,6 +129,8 @@ class _KnectAppState extends State<KnectApp> {
           create: (_) => NotificationsRepository(widget.apiClient),
         ),
         RepositoryProvider(create: (_) => PayslipRepository(widget.apiClient)),
+        RepositoryProvider(
+            create: (_) => ReimbursementRepository(widget.apiClient)),
         RepositoryProvider(
             create: (_) => PerformanceRepository(widget.apiClient)),
       ],
