@@ -14,6 +14,7 @@ import 'core/storage/device_identity.dart';
 import 'core/storage/token_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/application/auth_cubit.dart';
+import 'features/announcements/data/announcements_repository.dart';
 import 'features/approvals/data/approvals_repository.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/data/auth_repository.dart';
@@ -135,6 +136,8 @@ class _KnectAppState extends State<KnectApp> {
         RepositoryProvider(create: (_) => FaceRepository(widget.apiClient)),
         RepositoryProvider(
             create: (_) => PerformanceRepository(widget.apiClient)),
+        RepositoryProvider(
+            create: (_) => AnnouncementsRepository(widget.apiClient)),
       ],
       child: BlocProvider.value(
         value: widget.authCubit,

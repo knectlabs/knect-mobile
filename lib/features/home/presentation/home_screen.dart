@@ -10,6 +10,10 @@ import '../../../core/routing/app_router.dart';
 import '../../../core/time/format.dart';
 import '../../../shared/widgets/initials_avatar.dart';
 import '../../../shared/widgets/navigation.dart';
+import '../../announcements/application/announcements_cubit.dart';
+import '../../announcements/data/announcements_repository.dart';
+import '../../announcements/presentation/announcement_detail_screen.dart';
+import '../../announcements/presentation/announcements_screen.dart';
 import '../../approvals/presentation/approvals_screen.dart';
 import '../../attendance/data/attendance_repository.dart';
 import '../../attendance/presentation/attendance_screen.dart';
@@ -44,83 +48,107 @@ class HomeScreen extends StatelessWidget {
                 ? 'Good evening,'
                 : 'Good night,';
 
+    // Default visible order (first seven are the direct shortcuts; the rest
+    // live in All Apps once the eight-slot limit is exceeded).
     final apps = <_App>[
-      _App(Icons.beach_access, 'Time Off', const Color(0xFF2563EB),
+      _App(Icons.beach_access_outlined, 'Time Off',
           () => pushPage(context, const LeaveFormScreen())),
-      _App(Icons.location_on, 'Live Attendance', const Color(0xFFEF4444),
+      _App(Icons.location_on_outlined, 'Live Attendance',
           () => pushPage(context, const AttendanceScreen())),
-      _App(Icons.more_time, 'Overtime', const Color(0xFFDB2777),
+      _App(Icons.more_time_outlined, 'Overtime',
           () => pushPage(context, const OvertimeFormScreen())),
-      _App(Icons.edit_calendar, 'Correction', const Color(0xFF0D9488),
+      _App(Icons.edit_calendar_outlined, 'Correction',
           () => pushPage(context, const CorrectionFormScreen())),
-      _App(Icons.history, 'Attendance Log', const Color(0xFFF97316),
+      _App(Icons.history_outlined, 'Attendance Log',
           () => pushPage(context, const AttendanceLogScreen())),
-      _App(Icons.assignment, 'My Requests', const Color(0xFF16A34A),
+      _App(Icons.assignment_outlined, 'My Requests',
           () => context.go(AppRoutes.requests)),
-      _App(Icons.receipt_long, 'Payslip', BrandColors.primaryViolet,
+      _App(Icons.receipt_long_outlined, 'Payslip',
           () => pushPage(context, const PayslipsScreen())),
-      _App(
-          Icons.receipt_long_outlined,
-          'Reimbursement',
-          BrandColors.primaryViolet,
+      _App(Icons.account_balance_wallet_outlined, 'Reimbursement',
           () => pushPage(context, const ReimbursementsScreen())),
-      _App(Icons.flag, 'My Goals', BrandColors.primaryViolet,
+      _App(Icons.flag_outlined, 'My Goals',
           () => pushPage(context, const MyGoalsScreen())),
-      _App(Icons.rate_review, 'My Reviews', BrandColors.primaryViolet,
+      _App(Icons.rate_review_outlined, 'My Reviews',
           () => pushPage(context, const MyReviewsScreen())),
       if (canApprove(user?.role))
-        _App(Icons.fact_check, 'Approvals', BrandColors.primaryViolet,
+        _App(Icons.fact_check_outlined, 'Approvals',
             () => pushPage(context, const ApprovalsScreen())),
     ];
 
-    return Scaffold(
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => Future.wait([
-            context.read<AuthCubit>().refreshProfile(),
-            context.read<ProfileCubit>().load(),
-            context.read<TodayCubit>().load(),
-            context.read<RequestsCubit>().load(),
-            context.read<DirectoryCubit>().load(),
-            context.read<UnreadCountCubit>().refresh(),
-          ]),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            children: [
-              Row(
-                children: [
-                  InitialsAvatar(name: name, radius: 22),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocProvider(
+      create: (context) =>
+          AnnouncementsCubit(context.read<AnnouncementsRepository>()),
+      child: Builder(
+        builder: (context) {
+          final unread = context.watch<UnreadCountCubit>().state;
+          return Scaffold(
+            body: SafeArea(
+              child: RefreshIndicator(
+                onRefresh: () => Future.wait([
+                  context.read<AuthCubit>().refreshProfile(),
+                  context.read<ProfileCubit>().load(),
+                  context.read<TodayCubit>().load(),
+                  context.read<RequestsCubit>().load(),
+                  context.read<DirectoryCubit>().load(),
+                  context.read<UnreadCountCubit>().refresh(),
+                  context.read<AnnouncementsCubit>().load(),
+                ]),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  children: [
+                    Row(
                       children: [
-                        Text(
-                          greeting,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                        InitialsAvatar(name: name, radius: 22),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                greeting,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              Text(
+                                name,
+                                key: const Key('home.name'),
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          name,
-                          key: const Key('home.name'),
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        IconButton(
+                          key: const Key('home.notifications'),
+                          tooltip: 'Notifications',
+                          onPressed: () {
+                            context.read<UnreadCountCubit>().refresh();
+                            context.go(AppRoutes.inbox);
+                          },
+                          icon: Badge(
+                            isLabelVisible: unread > 0,
+                            label: Text(unread > 99 ? '99+' : '$unread'),
+                            child: const Icon(Icons.notifications_none),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    const _ShiftCard(),
+                    const SizedBox(height: 16),
+                    _AppGrid(apps: apps),
+                    const SizedBox(height: 16),
+                    const _AnnouncementsPreview(),
+                    _DirectReports(myEmployeeId: profile?.id),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              const _ShiftCard(),
-              const SizedBox(height: 16),
-              _AppGrid(apps: apps),
-              _DirectReports(myEmployeeId: profile?.id),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -356,12 +384,54 @@ class _ClockButtons extends StatelessWidget {
 /* Apps */
 
 class _App {
-  const _App(this.icon, this.label, this.color, this.onTap);
+  const _App(this.icon, this.label, this.onTap);
 
   final IconData icon;
   final String label;
-  final Color color;
   final VoidCallback onTap;
+}
+
+/// A single shortcut cell: a soft-lilac rounded container with a lilac icon and
+/// a label. Uniform treatment — no per-shortcut colours.
+class _AppTile extends StatelessWidget {
+  const _AppTile({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: dark
+                  ? BrandColors.primaryViolet.withValues(alpha: 0.18)
+                  : BrandColors.offWhite,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: BrandColors.primaryViolet, size: 24),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: theme.textTheme.labelMedium,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AppGrid extends StatelessWidget {
@@ -371,7 +441,12 @@ class _AppGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // Show at most 8 slots. If everything fits, show it all; otherwise show the
+    // first 7 real shortcuts and make slot 8 "All Apps" (opens a bottom sheet
+    // with the full grid).
+    final overflow = apps.length > 8;
+    final visible = overflow ? apps.take(7).toList() : apps;
+
     return Card(
       margin: EdgeInsets.zero,
       child: GridView.count(
@@ -382,38 +457,189 @@ class _AppGrid extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         childAspectRatio: 0.9,
         children: [
-          for (final app in apps)
-            InkWell(
+          for (final app in visible)
+            KeyedSubtree(
               key: Key('home.app.${app.label}'),
-              borderRadius: BorderRadius.circular(12),
-              onTap: app.onTap,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [app.color.withValues(alpha: 0.75), app.color],
-                      ),
-                    ),
-                    child: Icon(app.icon, color: Colors.white, size: 24),
+              child: _AppTile(
+                icon: app.icon,
+                label: app.label,
+                onTap: app.onTap,
+              ),
+            ),
+          if (overflow)
+            KeyedSubtree(
+              key: const Key('home.app.All Apps'),
+              child: _AppTile(
+                icon: Icons.apps_outlined,
+                label: 'All Apps',
+                onTap: () => _showAllApps(context, apps),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showAllApps(BuildContext context, List<_App> apps) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+                  child: Text(
+                    'All apps',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 8),
+                ),
+                GridView.count(
+                  crossAxisCount: 4,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 0.9,
+                  children: [
+                    for (final app in apps)
+                      KeyedSubtree(
+                        key: Key('home.allApps.${app.label}'),
+                        child: _AppTile(
+                          icon: app.icon,
+                          label: app.label,
+                          onTap: () {
+                            Navigator.of(sheetContext).pop();
+                            app.onTap();
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/* Announcements */
+
+/// Home preview of the latest published announcements: a section header with a
+/// "View all" action and the latest two to three items, each a compact row with
+/// subtle dividers. Backed by the Home-scoped [AnnouncementsCubit].
+class _AnnouncementsPreview extends StatelessWidget {
+  const _AnnouncementsPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tz = context.select(
+      (AuthCubit auth) => auth.state.user?.organization.timezone,
+    );
+    final state = context.watch<AnnouncementsCubit>().state;
+    final announcements = state.valueOrPrevious;
+
+    // Hide the whole section until we have something to show; errors and empty
+    // states stay quiet on Home (the full list surfaces them).
+    if (announcements == null || announcements.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final latest = announcements.take(3).toList();
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Announcements',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton(
+                  key: const Key('home.announcements.viewAll'),
+                  onPressed: () =>
+                      pushPage(context, const AnnouncementsScreen()),
+                  child: const Text('View all'),
+                ),
+              ],
+            ),
+            for (var i = 0; i < latest.length; i++) ...[
+              if (i > 0) const Divider(height: 1),
+              _PreviewRow(announcement: latest[i], tz: tz),
+            ],
+            const SizedBox(height: 4),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PreviewRow extends StatelessWidget {
+  const _PreviewRow({required this.announcement, required this.tz});
+
+  final Announcement announcement;
+  final String? tz;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final author = announcement.authorName;
+    final date = Clock.shortDate(Clock.toZone(announcement.displayDate, tz));
+    final subtitle =
+        author != null && author.isNotEmpty ? '$author · $date' : date;
+    return InkWell(
+      key: Key('home.announcement.${announcement.id}'),
+      onTap: () => pushPage(
+        context,
+        AnnouncementDetailScreen(announcement: announcement),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InitialsAvatar(name: author ?? 'Announcement', radius: 16),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    app.label,
-                    textAlign: TextAlign.center,
+                    announcement.title,
                     maxLines: 2,
-                    style: theme.textTheme.labelMedium,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: colors.onSurfaceVariant),
                   ),
                 ],
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
