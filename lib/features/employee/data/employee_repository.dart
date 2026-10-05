@@ -4,7 +4,8 @@ import '../../../core/network/json.dart';
 /// The signed-in user's employee profile (`GET /employees/me`).
 class EmployeeProfile {
   EmployeeProfile.fromJson(Json json)
-      : id = json.str('id'),
+      : profilePhotoUrl = json.strOrNull('profilePhotoUrl'),
+        id = json.str('id'),
         code = json.str('employeeCode'),
         fullName = json.str('fullName'),
         email = json.strOrNull('email'),
@@ -18,6 +19,7 @@ class EmployeeProfile {
         emergencyContactName = json.strOrNull('emergencyContactName'),
         emergencyContactPhone = json.strOrNull('emergencyContactPhone');
 
+  final String? profilePhotoUrl;
   final String id;
   final String code;
   final String fullName;

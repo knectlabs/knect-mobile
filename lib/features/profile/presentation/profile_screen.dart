@@ -8,10 +8,10 @@ import '../../auth/application/auth_cubit.dart';
 import '../../auth/domain/auth_models.dart';
 import '../../employee/data/employee_repository.dart';
 import '../../shell/signed_in_scope.dart';
-import '../../../shared/widgets/initials_avatar.dart';
+import '../../../shared/widgets/profile_photo_avatar.dart';
 import '../../../shared/widgets/large_title.dart';
 import '../../../shared/widgets/navigation.dart';
-import '../../face/presentation/face_enrollment_screen.dart';
+import 'profile_photo_screen.dart';
 
 /// Account tab: who the user is, their employee info, and sign-out.
 class ProfileScreen extends StatefulWidget {
@@ -166,8 +166,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _MenuTile(
                 icon: Icons.face_retouching_natural,
                 color: const Color(0xFF0EA5E9),
-                label: 'Face verification',
-                onTap: () => pushPage(context, const FaceEnrollmentPage()),
+                label: 'Profile photo',
+                onTap: () => pushPage(context, const ProfilePhotoScreen()),
               ),
               _MenuTile(
                 key: const Key('profile.signOut'),
@@ -247,7 +247,8 @@ class _AccountHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          InitialsAvatar(name: name, radius: 30),
+          ProfilePhotoAvatar(
+              name: name, photoUrl: profile?.profilePhotoUrl, radius: 30),
         ],
       ),
     );

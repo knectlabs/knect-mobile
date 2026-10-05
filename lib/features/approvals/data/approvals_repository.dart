@@ -33,6 +33,7 @@ class Approval {
         'LEAVE_REQUEST' => 'Leave',
         'OVERTIME_REQUEST' => 'Overtime',
         'ATTENDANCE_CORRECTION' => 'Correction',
+        'ATTENDANCE_LOCATION' => 'Outside location attendance',
         _ => targetType,
       };
 }

@@ -7,7 +7,11 @@ import '../../../core/storage/device_identity.dart';
 /// Today's schedule (`GET /schedules/me/today`).
 class TodaySchedule {
   TodaySchedule.fromJson(Json json)
-      : date = json.str('date'),
+      : outsideLocationAttendancePolicy =
+            json.strOrNull('outsideLocationAttendancePolicy') ?? 'BLOCK',
+        faceVerificationRequired = json['faceVerificationRequired'] == true,
+        faceReferenceReady = json['faceReferenceReady'] == true,
+        date = json.str('date'),
         timezone = json.str('timezone'),
         scheduled = json.str('status') == 'SCHEDULED',
         shiftName = json.objOrNull('shift')?.str('name'),
@@ -23,6 +27,9 @@ class TodaySchedule {
             ? AttendanceOffice.fromJson(json.obj('office'))
             : null;
 
+  final String outsideLocationAttendancePolicy;
+  final bool faceVerificationRequired;
+  final bool faceReferenceReady;
   final String date;
   final String timezone;
   final bool scheduled;
@@ -121,6 +128,16 @@ class ClockPosition {
 
 enum ClockAction { clockIn, clockOut }
 
+class ClockSubmission {
+  ClockSubmission.fromJson(Json json)
+      : pending = json.str('status') == 'PENDING',
+        record = json.str('status') == 'PENDING'
+            ? null
+            : AttendanceRecord.fromJson(json);
+  final bool pending;
+  final AttendanceRecord? record;
+}
+
 class AttendanceRepository {
   AttendanceRepository(this._api, this._device);
 
@@ -168,14 +185,11 @@ class AttendanceRepository {
     return data(await _api.dio.post('/files/images', data: form)).str('url');
   }
 
-  Future<AttendanceRecord> clock(
+  Future<ClockSubmission> clock(
     ClockAction action,
     ClockPosition position, {
     String? selfieUrl,
     String? note,
-    List<double>? faceEmbedding,
-    String? faceModelId,
-    double? faceSimilarity,
   }) async {
     final device = await _device.current();
     final path = action == ClockAction.clockIn
@@ -189,12 +203,7 @@ class AttendanceRepository {
       'deviceIdentifier': device.identifier,
       if (selfieUrl != null) 'selfieUrl': selfieUrl,
       if (note != null && note.isNotEmpty) 'note': note,
-      // The server re-decides the match; the embedding is a biometric secret
-      // (never logged). faceSimilarity is UX-only and ignored server-side.
-      if (faceEmbedding != null) 'faceEmbedding': faceEmbedding,
-      if (faceModelId != null) 'faceModelId': faceModelId,
-      if (faceSimilarity != null) 'faceSimilarity': faceSimilarity,
     });
-    return AttendanceRecord.fromJson(data(response));
+    return ClockSubmission.fromJson(data(response));
   }
 }

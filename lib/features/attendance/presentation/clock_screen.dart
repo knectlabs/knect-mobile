@@ -17,7 +17,6 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/time/format.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../auth/application/auth_cubit.dart';
-import '../../face/data/face_embedder.dart';
 import '../../shell/signed_in_scope.dart';
 import '../data/attendance_repository.dart';
 
@@ -162,6 +161,7 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
   Position? _position;
   _LocationProblem? _problem;
   bool _locating = false;
+  bool _submitting = false;
 
   AttendanceOffice? get _office => widget.schedule.office;
 
@@ -243,6 +243,22 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
   }
 
   Future<void> _next() async {
+    if (_submitting) return;
+    if (widget.schedule.faceVerificationRequired &&
+        !widget.schedule.faceReferenceReady) {
+      await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+                  title: const Text('Profile photo required'),
+                  content: const Text(
+                      'Profile photo required. Your company requires face verification for attendance.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'))
+                  ]));
+      return;
+    }
     final distance = _distance;
     final office = _office;
     String? note;
@@ -255,6 +271,7 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
           action: widget.action,
           distance: distance,
           office: office,
+          policy: widget.schedule.outsideLocationAttendancePolicy,
         ),
       );
       if (!mounted || result == null) return;
@@ -265,16 +282,56 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
       note = result.note;
     }
     final navigator = Navigator.of(context);
-    final record = await navigator.push<AttendanceRecord>(
-      MaterialPageRoute(
-        builder: (_) => ClockSelfieScreen(
-          action: widget.action,
-          schedule: widget.schedule,
-          position: _position!,
-          outsideNote: note,
+    ClockSubmission? submission;
+    if (!widget.schedule.faceVerificationRequired) {
+      setState(() => _submitting = true);
+      try {
+        final position = _position!;
+        submission = await context.read<AttendanceRepository>().clock(
+            widget.action,
+            ClockPosition(
+                latitude: position.latitude,
+                longitude: position.longitude,
+                accuracy: position.accuracy,
+                isMocked: position.isMocked),
+            note: note);
+      } catch (error) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(apiFailureOf(error).message)));
+        }
+        return;
+      } finally {
+        if (mounted) setState(() => _submitting = false);
+      }
+    } else {
+      submission = await navigator.push<ClockSubmission>(
+        MaterialPageRoute(
+          builder: (_) => ClockSelfieScreen(
+            action: widget.action,
+            schedule: widget.schedule,
+            position: _position!,
+            outsideNote: note,
+          ),
         ),
-      ),
-    );
+      );
+    }
+    if (submission?.pending == true && mounted) {
+      await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+                  title: const Text('Attendance pending approval'),
+                  content: const Text(
+                      'Your attendance request has been submitted to your manager. It will be recorded after approval.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'))
+                  ]));
+      if (mounted) navigator.pop(true);
+      return;
+    }
+    final record = submission?.record;
     if (record != null && mounted) {
       unawaited(navigator.pushReplacement(
         MaterialPageRoute(
@@ -334,7 +391,8 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
       bottomNavigationBar: _BottomAction(
         child: FilledButton(
           key: const Key('clock.next'),
-          onPressed: _position == null || _locating ? null : _next,
+          onPressed:
+              _position == null || _locating || _submitting ? null : _next,
           child: const Text('Next'),
         ),
       ),
@@ -612,11 +670,15 @@ class _OutOfRangeResult {
 
 class _OutOfRangeSheet extends StatefulWidget {
   const _OutOfRangeSheet(
-      {required this.action, required this.distance, required this.office});
+      {required this.action,
+      required this.distance,
+      required this.office,
+      required this.policy});
 
   final ClockAction action;
   final double distance;
   final AttendanceOffice office;
+  final String policy;
 
   @override
   State<_OutOfRangeSheet> createState() => _OutOfRangeSheetState();
@@ -634,9 +696,8 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Clock-out outside the area is accepted and flagged for review; clock-in
-    // outside it is rejected by the API.
-    final canContinue = widget.action == ClockAction.clockOut;
+    final canContinue = widget.policy != 'BLOCK';
+    final noteRequired = widget.policy == 'ALLOW_WITH_APPROVAL';
     final where =
         '${formatDistance(widget.distance)} from ${widget.office.name}';
     final radius = formatDistance(widget.office.radiusMeters);
@@ -675,14 +736,14 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
             ),
             const SizedBox(height: 16),
             Text(
-              canContinue
-                  ? 'You are $where. You can still clock out with a note; '
-                      'it will be flagged for your supervisor to review.'
-                  : 'You are $where. Clock in is only allowed within $radius '
-                      'of the office. Move closer and check again.',
+              noteRequired
+                  ? 'You are $where. Allowed radius: $radius. Add a note to submit an attendance request for manager approval.'
+                  : canContinue
+                      ? 'You are $where. Allowed radius: $radius. Your attendance will include an outside location flag.'
+                      : 'You are $where. Allowed radius: $radius. Move closer and check again.',
               style: theme.textTheme.bodyMedium,
             ),
-            if (canContinue) ...[
+            if (noteRequired) ...[
               const SizedBox(height: 16),
               TextField(
                 key: const Key('clock.outsideNote'),
@@ -702,11 +763,13 @@ class _OutOfRangeSheetState extends State<_OutOfRangeSheet> {
             const SizedBox(height: 16),
             if (canContinue)
               FilledButton(
-                onPressed: _note.text.trim().isEmpty
+                onPressed: noteRequired && _note.text.trim().isEmpty
                     ? null
                     : () => Navigator.pop(
                         context, _OutOfRangeResult.proceed(_note.text.trim())),
-                child: const Text('Continue clock out'),
+                child: Text(widget.action == ClockAction.clockIn
+                    ? 'Continue Clock In'
+                    : 'Continue Clock Out'),
               )
             else
               FilledButton(
@@ -756,11 +819,12 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
   CameraController? _camera;
   String? _cameraError;
   late final _note = TextEditingController(text: widget.outsideNote);
-  final _faceEmbedder = MlKitFaceEmbedder();
   String? _phase;
   ApiFailure? _failure;
 
-  bool get _noteRequired => widget.outsideNote != null;
+  bool get _noteRequired =>
+      widget.outsideNote != null &&
+      widget.schedule.outsideLocationAttendancePolicy == 'ALLOW_WITH_APPROVAL';
 
   @override
   void initState() {
@@ -774,7 +838,6 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
     WidgetsBinding.instance.removeObserver(this);
     _camera?.dispose();
     _note.dispose();
-    unawaited(_faceEmbedder.dispose());
     super.dispose();
   }
 
@@ -843,31 +906,11 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
       _failure = null;
       _phase = 'Taking photo…';
     });
-    final messenger = ScaffoldMessenger.of(context);
     try {
       final photo = await camera.takePicture();
-      // Detection + crop only (no liveness). The server makes the final 1:1
-      // match decision; the embedding vector is a biometric secret and is
-      // never logged. If no face is detected, submission still proceeds.
-      if (mounted) setState(() => _phase = 'Checking face…');
-      FaceEmbedding? face;
-      try {
-        face = await _faceEmbedder.detectAndEmbed(photo.path);
-      } catch (_) {
-        // Detection failure must not block attendance; proceed without a face.
-        face = null;
-      }
-      if (face == null && mounted) {
-        messenger.showSnackBar(const SnackBar(
-          content: Text(
-            'No face detected. Clocking in without face verification.',
-          ),
-          behavior: SnackBarBehavior.floating,
-        ));
-      }
       if (mounted) setState(() => _phase = 'Uploading selfie…');
       final selfieUrl = await repository.uploadImage(photo.path);
-      if (mounted) setState(() => _phase = 'Recording attendance…');
+      if (mounted) setState(() => _phase = 'Verifying face and submitting…');
       final position = widget.position;
       final record = await repository.clock(
         widget.action,
@@ -879,8 +922,6 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
         ),
         selfieUrl: selfieUrl,
         note: note,
-        faceEmbedding: face?.vector,
-        faceModelId: face?.modelId,
       );
       navigator.pop(record);
     } catch (error) {
