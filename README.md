@@ -116,6 +116,18 @@ flutter test
 flutter build apk --debug
 ```
 
+> **Known build issue (Android full APK):** `flutter build apk` currently fails
+> at `:tflite_flutter:compileDebugKotlin` with "Inconsistent JVM-target
+> compatibility" because `tflite_flutter` 0.11.0 pins its Android module to
+> Java 1.8 while the current toolchain (AGP 9, Kotlin 2.x, JDK 21) compiles its
+> Kotlin at a newer target. `android/build.gradle.kts` raises library
+> subprojects to Java 17 and `gradle.properties` relaxes Kotlin JVM-target
+> validation, but the plugin's own configuration is not fully overridable under
+> AGP 9. `flutter analyze` and `flutter build apk --config-only` both pass; the
+> resolution is to upgrade `tflite_flutter` to an AGP‑9‑compatible release (or
+> pin a compatible AGP). The face-embedding model itself is verified
+> independently (see the face verification notes).
+
 ## Current features
 
 - Login with JWT access + refresh token
