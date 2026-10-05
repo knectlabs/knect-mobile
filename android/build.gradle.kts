@@ -1,4 +1,6 @@
 import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 
 allprojects {
     repositories {
@@ -17,6 +19,15 @@ allprojects {
 // (The app module already targets 17.)
 subprojects {
     plugins.withId("com.android.library") {
+        if (name == "tflite_flutter") {
+            extensions.configure(LibraryAndroidComponentsExtension::class.java) {
+                finalizeDsl {
+                    // The plugin pins SDK 31, below its transitive AndroidX requirements.
+                    it.compileSdk = project(":app")
+                        .extensions.getByType(ApplicationExtension::class.java).compileSdk
+                }
+            }
+        }
         extensions.configure(LibraryExtension::class.java) {
             compileOptions {
                 sourceCompatibility = JavaVersion.VERSION_17
