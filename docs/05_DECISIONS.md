@@ -247,3 +247,8 @@ Home quick actions (including All Apps) and Account menu rows use original local
 ### 2026-10-06: Requests add action
 
 Requests uses a trailing AppBar plus button with the New request tooltip to open the existing category bottom sheet. The bottom full-width creation button is removed to leave more room for request history. Attendance retains existing record-based availability: Clock In disabled after entry, Clock Out available within the existing rules, and both disabled after exit. No routing or policy changes.
+
+
+### 2026-10-06: Requests floating add button
+
+At user direction, New request moves from the AppBar to the standard bottom-right FloatingActionButton above the main navigation. It retains its tooltip, widget key, and category sheet. Request list bottom padding leaves space to scroll the final item clear of the button.

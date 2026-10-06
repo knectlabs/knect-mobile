@@ -89,23 +89,18 @@ class _RequestsScreenState extends State<RequestsScreen> {
     final role = context.select((AuthCubit cubit) => cubit.state.user?.role);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Requests'),
-        actions: [
-          IconButton(
-            key: const Key('requests.new'),
-            tooltip: 'New request',
-            onPressed: _new,
-            icon: const Icon(Icons.add),
-          ),
-          const SizedBox(width: KnectSpacing.sm),
-        ],
+      appBar: AppBar(title: const Text('Requests')),
+      floatingActionButton: FloatingActionButton(
+        key: const Key('requests.new'),
+        tooltip: 'New request',
+        onPressed: _new,
+        child: const Icon(Icons.add),
       ),
       body: RefreshIndicator(
         onRefresh: context.read<RequestsCubit>().load,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(KnectSpacing.xl, KnectSpacing.sm,
-              KnectSpacing.xl, KnectSpacing.xxl),
+          padding: const EdgeInsets.fromLTRB(
+              KnectSpacing.xl, KnectSpacing.sm, KnectSpacing.xl, 96),
           children: [
             if (canApprove(role)) ...[
               Card(
