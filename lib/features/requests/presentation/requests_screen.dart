@@ -91,7 +91,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Requests')),
       bottomNavigationBar: Material(
-          color: KnectColors.surface,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           child: SafeArea(
               top: false,
               minimum: const EdgeInsets.fromLTRB(KnectSpacing.xl,
@@ -251,7 +251,7 @@ class _Balances extends StatelessWidget {
             width: 160,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: KnectColors.lilacSurface,
+              color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(

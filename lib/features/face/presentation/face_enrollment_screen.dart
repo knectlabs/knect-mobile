@@ -1,4 +1,3 @@
-import '../../../core/theme/knect_tokens.dart';
 import 'dart:async';
 
 import 'package:camera/camera.dart';
@@ -220,7 +219,7 @@ class _StatusCard extends StatelessWidget {
         leading: Icon(
           enrolled ? Icons.verified_user : Icons.no_accounts,
           color: enrolled
-              ? KnectColors.success
+              ? const Color(0xFF1F8A5B)
               : theme.colorScheme.onSurfaceVariant,
         ),
         title: Text(enrolled ? 'Face enrolled' : 'Not enrolled yet'),

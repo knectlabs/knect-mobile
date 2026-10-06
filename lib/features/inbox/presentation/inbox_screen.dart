@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../shared/widgets/large_title.dart';
-import '../../../core/theme/knect_tokens.dart';
 import '../../../shared/widgets/navigation.dart';
 import '../../approvals/presentation/approvals_screen.dart';
 import '../../auth/application/auth_cubit.dart';
@@ -50,7 +49,7 @@ class InboxScreen extends StatelessWidget {
                 ),
               ),
               ColoredBox(
-                color: KnectColors.surface,
+                color: Theme.of(context).colorScheme.surfaceContainerLowest,
                 child: TabBar(
                   labelStyle: theme.textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.w600),

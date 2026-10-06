@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 abstract final class KnectColors {
-  static const lightPurple = Color(0xFFA78BFA);
-  static const lilac = Color(0xFFC4B5FD);
-  static const background = Color(0xFFF7F5FF);
+  static const lightPurple = Color(0xFFAB9AFA);
+  static const lilac = Color(0xFFD8CEFC);
+  static const background = Color(0xFFF8F7FC);
   static const surface = Color(0xFFFFFFFF);
-  static const primary = Color(0xFF8B5CF6);
-  static const strongPrimary = Color(0xFF7C3AED);
-  static const textPrimary = Color(0xFF1F2937);
+  static const primary = Color(0xFF7D5CF5);
+  static const strongPrimary = Color(0xFF583CCD);
+  static const textPrimary = Color(0xFF19152B);
   static const textSecondary = Color(0xFF6B7280);
   static const mutedText = Color(0xFF606978);
   static const border = Color(0xFFE9E5F5);
-  static const lilacSurface = Color(0xFFF0EBFF);
+  static const lilacSurface = Color(0xFFEFE8FC);
   static const success = Color(0xFF166534);
   static const successSurface = Color(0xFFDCFCE7);
   static const warning = Color(0xFF854D0E);

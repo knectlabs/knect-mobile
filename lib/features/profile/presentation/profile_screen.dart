@@ -107,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const _SectionTitle('My Info'),
                 _MenuTile(
                   icon: Icons.account_circle_outlined,
-                  color: KnectColors.strongPrimary,
+                  color: const Color(0xFF2563EB),
                   label: 'Personal Info',
                   onTap: () => open('Personal Info', [
                     (Icons.person_outline, 'Full name', profile.fullName),
@@ -118,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 _MenuTile(
                   icon: Icons.work_outline,
-                  color: KnectColors.strongPrimary,
+                  color: const Color(0xFF7C3AED),
                   label: 'Employment Info',
                   onTap: () => open('Employment Info', [
                     (Icons.work_outline, 'Position', profile.position?.name),
@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 _MenuTile(
                   icon: Icons.emergency_outlined,
-                  color: KnectColors.strongPrimary,
+                  color: const Color(0xFFDC2626),
                   label: 'Emergency Contact Info',
                   onTap: () => open('Emergency Contact Info', [
                     (
@@ -166,21 +166,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const _SectionTitle('Settings'),
               _MenuTile(
                 icon: Icons.face_retouching_natural,
-                color: KnectColors.strongPrimary,
+                color: const Color(0xFF0EA5E9),
                 label: 'Profile photo',
                 onTap: () => pushPage(context, const ProfilePhotoScreen()),
               ),
               _MenuTile(
                 key: const Key('profile.signOut'),
                 icon: Icons.logout,
-                color: KnectColors.strongPrimary,
+                color: const Color(0xFFEA580C),
                 label: 'Sign out',
                 showChevron: false,
                 onTap: _busy ? null : () => _signOut(everywhere: false),
               ),
               _MenuTile(
                 icon: Icons.devices_outlined,
-                color: KnectColors.strongPrimary,
+                color: const Color(0xFF64748B),
                 label: 'Sign out of all devices',
                 showChevron: false,
                 onTap: _busy ? null : () => _signOut(everywhere: true),
@@ -295,13 +295,13 @@ class _MenuTile extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          tileColor: KnectColors.surface,
+          tileColor: Theme.of(context).colorScheme.surfaceContainerLowest,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           leading: Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-                color: KnectColors.lilacSurface,
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(KnectRadius.field)),
             child: Icon(icon, color: color, size: 22),
           ),

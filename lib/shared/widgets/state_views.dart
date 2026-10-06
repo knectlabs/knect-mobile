@@ -89,17 +89,18 @@ class EmptyView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: KnectSpacing.xxl, vertical: KnectSpacing.section),
       decoration: BoxDecoration(
-          color: KnectColors.surface,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(KnectRadius.card),
-          border: Border.all(color: KnectColors.border)),
+          border: Border.all(color: theme.colorScheme.outlineVariant)),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-                color: KnectColors.lilacSurface,
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(KnectRadius.sheet)),
-            child: Icon(icon, size: 36, color: KnectColors.strongPrimary)),
+            child: Icon(icon,
+                size: 36, color: theme.colorScheme.onPrimaryContainer)),
         const SizedBox(height: KnectSpacing.xxl),
         Text(title,
             style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
@@ -107,8 +108,8 @@ class EmptyView extends StatelessWidget {
           const SizedBox(height: KnectSpacing.sm),
           Text(message!,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: KnectColors.textSecondary)),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
         ],
         if (action != null) ...[
           const SizedBox(height: KnectSpacing.xxl),
@@ -169,13 +170,24 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final (background, foreground) = switch (tone) {
-      StatusTone.success => (KnectColors.successSurface, KnectColors.success),
-      StatusTone.warning => (KnectColors.warningSurface, KnectColors.warning),
-      StatusTone.danger => (KnectColors.dangerSurface, KnectColors.danger),
+      StatusTone.success => (
+          const Color(0xFF1F8A5B).withValues(alpha: dark ? 0.25 : 0.12),
+          dark ? const Color(0xFF7FD8AE) : const Color(0xFF13643F),
+        ),
+      StatusTone.warning => (
+          const Color(0xFFC98A0B).withValues(alpha: dark ? 0.25 : 0.14),
+          dark ? const Color(0xFFF2C66D) : const Color(0xFF7A5205),
+        ),
+      StatusTone.danger => (
+          colors.error.withValues(alpha: dark ? 0.2 : 0.12),
+          dark ? colors.error : colors.onErrorContainer,
+        ),
       StatusTone.neutral => (
-          KnectColors.lilacSurface,
-          KnectColors.textSecondary
+          colors.surfaceContainerHighest,
+          colors.onSurfaceVariant
         ),
     };
     return Container(

@@ -1,4 +1,3 @@
-import '../../../core/theme/knect_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -297,9 +296,9 @@ class _ApprovalTile extends StatelessWidget {
       color: theme.colorScheme.onSurfaceVariant,
     );
     final (icon, color) = switch (approval.targetType) {
-      'LEAVE_REQUEST' => (Icons.beach_access, KnectColors.strongPrimary),
-      'OVERTIME_REQUEST' => (Icons.more_time, KnectColors.strongPrimary),
-      _ => (Icons.edit_calendar, KnectColors.strongPrimary),
+      'LEAVE_REQUEST' => (Icons.beach_access, const Color(0xFF2563EB)),
+      'OVERTIME_REQUEST' => (Icons.more_time, const Color(0xFFEA580C)),
+      _ => (Icons.edit_calendar, const Color(0xFF0D9488)),
     };
     return InkWell(
       onTap: onTap,

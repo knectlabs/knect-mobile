@@ -29,3 +29,8 @@ No legacy dark screen surfaces remain in lib. Camera image/scrim and small shado
 Only flutter analyze and test/mobile_visual_system_test.dart are used for mobile verification. The targeted tests exercise priority-screen navigation, request creation menus, announcement detail, location/camera error states and forced-light login. Optional KNECT_CAPTURE_UI=1 creates screenshots under .agents/tasks/mobile-visual-system; optional KNECT_UI_FONT and KNECT_UI_ICON_FONT load local preview fonts. No full regression suite is run. Widget compilation is verified; a new APK and physical Pixel camera flow are not verified by these checks.
 
 Final result: six targeted checks passed (390 and 320 widths, 130% text scale, location/selfie error states, AA text/action contrast and light login on a dark-mode device). Flutter analyze passed. Android light launch resource XML is valid. No full regression, APK rebuild or physical-device acceptance was run.
+
+
+## Current palette override (2026-10-06)
+
+The user requested the original colors back. AppTheme and BrandColors now use the original violet palette and system light/dark mode. New surfaces follow ThemeData rather than fixed white backgrounds. Layout improvements and request navigation remain; Cloudinary is unchanged. The forced-light login check is replaced by a system-dark-mode check. Earlier bright-palette screenshots describe the prior revision.

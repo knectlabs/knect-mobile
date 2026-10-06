@@ -1,4 +1,3 @@
-import '../../../core/theme/knect_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -140,11 +139,11 @@ class _NotificationTile extends StatelessWidget {
     final unread = notification.unread;
     final type = notification.type;
     final (icon, color) = type.contains('APPROVED')
-        ? (Icons.check_circle, KnectColors.success)
+        ? (Icons.check_circle, const Color(0xFF16A34A))
         : type.contains('REJECTED')
             ? (Icons.cancel, colors.error)
             : type.contains('APPROVAL')
-                ? (Icons.pending_actions, KnectColors.warning)
+                ? (Icons.pending_actions, const Color(0xFFF59E0B))
                 : (Icons.notifications, colors.primary);
     return InkWell(
       onTap: () => onOpen(notification),

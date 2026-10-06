@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/brand/brand.dart';
-import '../../../core/theme/knect_tokens.dart';
 import '../application/auth_cubit.dart';
 import '../application/login_cubit.dart';
 import '../data/auth_repository.dart';
@@ -56,7 +55,7 @@ class _LoginViewState extends State<_LoginView> {
   Widget build(BuildContext context) {
     // The brand band paints edge to edge behind the status bar.
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
+      value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
@@ -67,7 +66,7 @@ class _LoginViewState extends State<_LoginView> {
             children: [
               DecoratedBox(
                 decoration: const BoxDecoration(
-                  color: KnectColors.lilacSurface,
+                  gradient: BrandColors.brandGradient,
                 ),
                 child: _BrandBand(
                   screenHeight: MediaQuery.sizeOf(context).height,
@@ -128,7 +127,7 @@ class _BrandBand extends StatelessWidget {
                 Text(
                   Brand.name,
                   style: text.titleMedium?.copyWith(
-                    color: KnectColors.textPrimary,
+                    color: BrandColors.offWhite,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
                   ),
@@ -139,7 +138,7 @@ class _BrandBand extends StatelessWidget {
             Text(
               'Your workday,\nin one place.',
               style: text.headlineMedium?.copyWith(
-                color: KnectColors.textPrimary,
+                color: BrandColors.offWhite,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
               ),
@@ -148,7 +147,7 @@ class _BrandBand extends StatelessWidget {
             Text(
               'Clock in, request leave, and follow approvals.',
               style: text.bodyMedium?.copyWith(
-                color: KnectColors.mutedText,
+                color: BrandColors.offWhite.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -354,9 +353,14 @@ class _Banner extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final error = tone == _BannerTone.error;
-    final foreground = error ? colors.onErrorContainer : colors.onSurface;
-    final background =
-        error ? colors.errorContainer : colors.secondaryContainer;
+    final dark = theme.brightness == Brightness.dark;
+    // Dark mode uses a tinted surface; a solid error container is too loud.
+    final foreground = error
+        ? (dark ? colors.error : colors.onErrorContainer)
+        : colors.onSurface;
+    final background = error
+        ? (dark ? colors.error.withValues(alpha: 0.14) : colors.errorContainer)
+        : colors.secondaryContainer;
     return Semantics(
       liveRegion: true,
       child: Container(

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/async/async_value.dart';
 import '../../../core/theme/knect_tokens.dart';
+import '../../../core/brand/brand.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/time/format.dart';
 import '../../../shared/widgets/initials_avatar.dart';
@@ -169,7 +170,8 @@ class _ShiftCard extends StatelessWidget {
     final colors = theme.colorScheme;
     final state = context.watch<TodayCubit>().state;
     final today = state.valueOrPrevious;
-    const tint = KnectColors.surface;
+    final tint = BrandColors.primaryViolet
+        .withValues(alpha: theme.brightness == Brightness.dark ? 0.16 : 0.08);
 
     Widget body;
     var title = 'Shift schedule';
@@ -281,19 +283,20 @@ class _ShiftCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: KnectColors.border),
+        border: Border.all(
+            color: BrandColors.primaryViolet.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            color: KnectColors.lilacSurface,
+            color: BrandColors.secondaryViolet,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Text(
               title,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
-                color: KnectColors.strongPrimary,
+                color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -417,10 +420,10 @@ class _AppTile extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: KnectColors.lilacSurface,
+              color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: KnectColors.strongPrimary, size: 24),
+            child: Icon(icon, color: BrandColors.primaryViolet, size: 24),
           ),
           const SizedBox(height: 8),
           Text(

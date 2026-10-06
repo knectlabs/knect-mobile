@@ -263,15 +263,14 @@ void main() {
     }
   });
 
-  testWidgets('sign in stays light when the device requests dark mode',
-      (tester) async {
+  testWidgets('sign in follows the device dark mode', (tester) async {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
     await _pump(tester, signedIn: false);
     expect(
         Theme.of(tester.element(find.text('Sign in to your account')))
             .brightness,
-        Brightness.light);
+        Brightness.dark);
     expect(tester.takeException(), isNull);
     await _capture(tester, 'login');
   });
