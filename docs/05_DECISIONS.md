@@ -242,3 +242,8 @@ Directory responses include the existing profilePhotoUrl for colleagues within t
 ### 2026-10-06: Home shortcuts and Account menu icons
 
 Home quick actions (including All Apps) and Account menu rows use original local SVG line icons through KnectFeatureIcon. Icons use the theme onSurface color on a neutral surfaceContainerHigh background instead of purple-on-purple and individual Account colors. Existing labels, destinations, profile-photo rendering, and attendance policy/flow are preserved. Verified with Flutter analyze and targeted screen widget checks at 320/390 px and enlarged text, plus rendered Home and Account screenshots.
+
+
+### 2026-10-06: Requests add action
+
+Requests uses a trailing AppBar plus button with the New request tooltip to open the existing category bottom sheet. The bottom full-width creation button is removed to leave more room for request history. Attendance retains existing record-based availability: Clock In disabled after entry, Clock Out available within the existing rules, and both disabled after exit. No routing or policy changes.
