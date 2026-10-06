@@ -7,6 +7,7 @@ class Colleague {
   Colleague.fromJson(Json json)
       : id = json.str('id'),
         fullName = json.str('fullName'),
+        profilePhotoUrl = json.strOrNull('profilePhotoUrl'),
         code = json.str('employeeCode'),
         position = json.strOrNull('position'),
         department = json.strOrNull('department'),
@@ -18,6 +19,7 @@ class Colleague {
 
   final String id;
   final String fullName;
+  final String? profilePhotoUrl;
   final String code;
   final String? position;
   final String? department;

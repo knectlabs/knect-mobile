@@ -35,17 +35,26 @@ class _ProfilePhotoAvatarState extends State<ProfilePhotoAvatar> {
 
   Future<Uint8List?> _load() async {
     final url = widget.photoUrl;
-    if (url == null) return null;
+    if (url == null || url.trim().isEmpty) return null;
     final api = context.read<ApiClient>();
     final uri = Uri.tryParse(url);
     final base = Uri.parse(api.dio.options.baseUrl);
     // Protected images must use the configured API host, including after a tunnel URL changes.
-    if (uri == null || !uri.path.startsWith('/api/v1/files/')) {
-      return null;
-    }
-    final target = base.replace(path: uri.path, query: null, fragment: null);
+    if (uri == null) return null;
+    final protected = uri.path.startsWith('/api/v1/files/');
+    if (!protected && (uri.scheme != 'https' || uri.host.isEmpty)) return null;
+    final target = protected
+        ? base.replace(path: uri.path, query: null, fragment: null)
+        : uri;
     try {
-      final response = await api.dio.get<List<int>>(target.toString(),
+      // Public profile images use a separate client without API credentials.
+      final client = protected
+          ? api.dio
+          : Dio(BaseOptions(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 10),
+            ));
+      final response = await client.get<List<int>>(target.toString(),
           options: Options(responseType: ResponseType.bytes));
       final bytes = response.data;
       return bytes == null ? null : Uint8List.fromList(bytes);
@@ -62,7 +71,15 @@ class _ProfilePhotoAvatarState extends State<ProfilePhotoAvatar> {
         if (bytes == null) {
           return InitialsAvatar(name: widget.name, radius: widget.radius);
         }
-        return CircleAvatar(
-            radius: widget.radius, backgroundImage: MemoryImage(bytes));
+        return ClipOval(
+          child: Image.memory(
+            bytes,
+            width: widget.radius * 2,
+            height: widget.radius * 2,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                InitialsAvatar(name: widget.name, radius: widget.radius),
+          ),
+        );
       });
 }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/async/async_value.dart';
-import '../../../shared/widgets/initials_avatar.dart';
+import '../../../shared/widgets/profile_photo_avatar.dart';
 import '../../../shared/widgets/large_title.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../data/directory_repository.dart';
@@ -139,7 +139,10 @@ class _DirectoryList extends StatelessWidget {
                     width: 64,
                     child: Column(
                       children: [
-                        InitialsAvatar(name: away[index].fullName, radius: 24),
+                        ProfilePhotoAvatar(
+                            name: away[index].fullName,
+                            photoUrl: away[index].profilePhotoUrl,
+                            radius: 24),
                         const SizedBox(height: 6),
                         Text(
                           away[index].firstName,
@@ -208,7 +211,10 @@ class _PersonTile extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 10, 8, 10),
       child: Row(
         children: [
-          InitialsAvatar(name: person.fullName, radius: 20),
+          ProfilePhotoAvatar(
+              name: person.fullName,
+              photoUrl: person.profilePhotoUrl,
+              radius: 20),
           const SizedBox(width: 16),
           Expanded(
             child: Column(

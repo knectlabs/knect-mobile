@@ -25,6 +25,7 @@ dependencies:
   url_launcher: ^6.3.3
   firebase_core: ^4.15.0
   firebase_messaging: ^16.7.0
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +35,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons/
     - assets/brand/knect_icon.png
     - assets/brand/knect_wordmark.png
     - assets/models/mobilefacenet.tflite

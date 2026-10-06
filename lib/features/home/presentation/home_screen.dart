@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/widgets/clock_action_buttons.dart';
 import '../../../core/async/async_value.dart';
-import '../../../core/theme/knect_tokens.dart';
 import '../../../core/brand/brand.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/time/format.dart';
@@ -322,69 +322,16 @@ class _ShiftCard extends StatelessWidget {
 
 class _ClockButtons extends StatelessWidget {
   const _ClockButtons({required this.next});
-
-  /// The action available now; the other half is disabled.
   final ClockAction? next;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    Widget half(ClockAction action, IconData icon, String label, Color color) {
-      final enabled = next == action;
-      return Expanded(
-        child: InkWell(
-          key: Key('home.${action.name}'),
-          onTap: enabled ? () => openClock(context, action) : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            child: Opacity(
-              opacity: enabled ? 1 : 0.4,
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: KnectSpacing.sm,
-                runSpacing: KnectSpacing.xs,
-                children: [
-                  Icon(icon, color: color),
-                  Text(
-                    label,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+  Widget build(BuildContext context) => ClockActionButtons(
+        keyPrefix: 'home',
+        canClockIn: next == ClockAction.clockIn,
+        canClockOut: next == ClockAction.clockOut,
+        onClockIn: () => openClock(context, ClockAction.clockIn),
+        onClockOut: () => openClock(context, ClockAction.clockOut),
       );
-    }
-
-    return Material(
-      color: colors.surfaceContainerLowest,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: colors.outlineVariant),
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            half(ClockAction.clockIn, Icons.login_rounded, 'Clock In',
-                KnectColors.strongPrimary),
-            VerticalDivider(
-                width: 1,
-                indent: 10,
-                endIndent: 10,
-                color: colors.outlineVariant),
-            half(ClockAction.clockOut, Icons.logout_rounded, 'Clock Out',
-                colors.error),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 /* Apps */
@@ -423,7 +370,8 @@ class _AppTile extends StatelessWidget {
               color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: BrandColors.primaryViolet, size: 24),
+            child: Icon(icon,
+                color: theme.colorScheme.onPrimaryContainer, size: 24),
           ),
           const SizedBox(height: 8),
           Text(
@@ -708,8 +656,10 @@ class _DirectReports extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 10),
                       child: Tooltip(
                         message: person.fullName,
-                        child:
-                            InitialsAvatar(name: person.fullName, radius: 24),
+                        child: ProfilePhotoAvatar(
+                            name: person.fullName,
+                            photoUrl: person.profilePhotoUrl,
+                            radius: 24),
                       ),
                     ),
                   if (reports.length > shown)

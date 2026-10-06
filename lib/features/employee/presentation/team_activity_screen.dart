@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/async/async_value.dart';
 import '../../../core/time/format.dart';
-import '../../../shared/widgets/initials_avatar.dart';
+import '../../../shared/widgets/profile_photo_avatar.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../attendance/data/attendance_repository.dart';
 import '../../auth/application/auth_cubit.dart';
@@ -88,7 +88,8 @@ class _ReportTile extends StatelessWidget {
         value == null ? '--:--' : Clock.hm(value, record?.timezone);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      leading: InitialsAvatar(name: person.fullName, radius: 20),
+      leading: ProfilePhotoAvatar(
+          name: person.fullName, photoUrl: person.profilePhotoUrl, radius: 20),
       title: Text(person.fullName),
       subtitle: Text(
         record == null

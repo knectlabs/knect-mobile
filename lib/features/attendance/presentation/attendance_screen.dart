@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../shared/widgets/clock_action_buttons.dart';
 import '../../../core/async/async_value.dart';
 import '../../../core/brand/brand.dart';
 import '../../../core/geo/distance.dart';
@@ -245,28 +246,12 @@ class _ScheduleCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton(
-                    key: const Key('attendance.clockIn'),
-                    onPressed: next.action == ClockAction.clockIn
-                        ? () => openClock(context, ClockAction.clockIn)
-                        : null,
-                    child: const Text('Clock in'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    key: const Key('attendance.clockOut'),
-                    onPressed: next.action == ClockAction.clockOut
-                        ? () => openClock(context, ClockAction.clockOut)
-                        : null,
-                    child: const Text('Clock out'),
-                  ),
-                ),
-              ],
+            ClockActionButtons(
+              keyPrefix: 'attendance',
+              canClockIn: next.action == ClockAction.clockIn,
+              canClockOut: next.action == ClockAction.clockOut,
+              onClockIn: () => openClock(context, ClockAction.clockIn),
+              onClockOut: () => openClock(context, ClockAction.clockOut),
             ),
             if (next.action == null) ...[
               const SizedBox(height: 10),
