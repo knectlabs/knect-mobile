@@ -1,154 +1,95 @@
 # Knect Mobile
 
-Flutter employee self-service app for Knect.
+Flutter employee self-service app for Knect. Employees can view their shift, record attendance, submit requests, track approvals, read announcements, and access profile, payslip, and performance information.
 
-## Local setup
+## Available flows
 
-Requirements: Flutter stable with an Android SDK, or Xcode on macOS for iOS.
+- Login, session restore/refresh, sign-out, and sign-out on all devices.
+- Home with shift status, attendance actions, quick actions, announcements, and manager direct reports.
+- Employee directory, team activity, and profile pictures where available.
+- Location/geofence decision, required selfie/face verification, attendance result/history, and corrections.
+- Leave, overtime, reimbursement, request history, and role-restricted approvals.
+- Inbox notifications/approval entry, optional FCM delivery, payslips, goals/reviews, and announcement detail.
+- Profile information and profile-photo upload. A separate employee face enrollment is not needed.
+
+Recruitment administration belongs to Admin/API; this mobile app does not provide a recruitment console. Forgot/reset password is not implemented; the login screen directs users to HR.
+
+## Stack and structure
+
+Flutter/Dart, Dio, BLoC/Cubit, go_router, flutter_secure_storage, geolocator, camera/image_picker, flutter_map, Firebase Messaging, and flutter_svg.
+
+| Path                                 | Purpose                                           |
+| ------------------------------------ | ------------------------------------------------- |
+| `lib/features/`                      | Feature screens, repositories, models, and state  |
+| `lib/core/config/`                   | Compile-time environment validation               |
+| `lib/core/network/`                  | Shared API client, token refresh, and errors      |
+| `lib/core/storage/`                  | Secure tokens and installation device identity    |
+| `lib/core/routing/`                  | Routes and authentication redirects               |
+| `lib/core/theme/`, `lib/core/brand/` | Theme, tokens, and Knect palette                  |
+| `lib/shared/widgets/`                | Reusable UI, profile avatars, and icon components |
+| `assets/icons/`, `assets/brand/`     | Original SVG icons and brand artwork              |
+| `android/`, `ios/`                   | Platform projects                                 |
+| `test/`                              | Widget and unit checks                            |
+
+## Local setup and backend URL
+
+Use a Flutter SDK compatible with the lockfile, Android SDK/JDK for Android, or Xcode on macOS for iOS. Start Knect API first.
 
 ```bash
+flutter doctor
 flutter pub get
-flutter run
+flutter run --dart-define-from-file=env/development.json
 ```
 
-The checked-in platform projects target Android and iOS. Run `flutter doctor`
-to verify the local toolchain before starting the app.
+The backend configuration file is `env/development.json`. Values are compiled into the app, so restart/rebuild after editing; changing API `.env` does not change the mobile URL.
 
-## Environments
+| Define         | Values                                                               |
+| -------------- | -------------------------------------------------------------------- |
+| `APP_ENV`      | `development` (default), `staging`, `production`                     |
+| `API_BASE_URL` | Absolute URL ending in `/api/v1`; HTTPS required outside development |
 
-The app reads its environment at compile time through `--dart-define`.
-Screens and repositories never contain API URLs; they use `AppConfig` through
-the shared `ApiClient`.
-
-| Variable       | Values                                  | Notes                                       |
-| -------------- | --------------------------------------- | ------------------------------------------- |
-| `APP_ENV`      | `development`, `staging`, `production`  | Defaults to `development`.                  |
-| `API_BASE_URL` | absolute URL ending in `/api/v1`        | Required and HTTPS-only outside development |
-
-Development defaults to `http://10.0.2.2:3000/api/v1`, the Android emulator
-alias for the host machine running the Knect API repository. Debug Android builds allow
-cleartext HTTP for this purpose; release builds do not. On the iOS simulator or
-a physical device, pass a reachable URL:
+Without an override, development uses `http://10.0.2.2:3000/api/v1`, which reaches the host from the standard Android emulator. A physical Pixel needs the computer's reachable LAN address or an HTTPS tunnel URL; phone `localhost` refers to the phone.
 
 ```bash
-flutter run --dart-define-from-file=env/development.json
-flutter run --dart-define=API_BASE_URL=http://localhost:3000/api/v1
+flutter run --dart-define=API_BASE_URL=https://your-tunnel.example/api/v1
+```
 
-# Staging / production: copy the example and set the real URL (git-ignored)
-cp env/staging.example.json env/staging.json
+For a tunnel, expose the backend's port 3000 and use its HTTPS URL plus `/api/v1`. If it changes, update the define and restart. For LAN access, confirm both devices share a network and the API port is reachable. A healthy emulator connection alone does not prove phone connectivity.
+
+For staging/release, copy `env/staging.example.json` to ignored `env/staging.json`, set the URL, then run:
+
+```bash
 flutter build apk --release --dart-define-from-file=env/staging.json
 ```
 
-An invalid or missing configuration fails at startup instead of falling back to
-an unexpected API.
+Never put Cloudinary secrets, JWT signing secrets, or database credentials in Flutter defines. Images upload through authenticated API endpoints; storage-provider integration is owned by the backend. JPG/PNG/WebP image uploads are supported; general PDF/Office document uploads are not part of the current image contract.
 
-## Foundation (Phase 0)
+## Attendance behavior
 
-| Concern            | Location                                   |
-| ------------------ | ------------------------------------------ |
-| Environment config | `lib/core/config/app_config.dart`          |
-| HTTP client (Dio)  | `lib/core/network/api_client.dart`         |
-| API error model    | `lib/core/network/api_failure.dart`        |
-| Secure token store | `lib/core/storage/token_storage.dart`      |
-| Session state      | `lib/features/auth/application/auth_cubit.dart` |
-| Routing + guard    | `lib/core/routing/app_router.dart`         |
-| Theme              | `lib/core/theme/app_theme.dart`            |
+The flow starts with location and geofence checking. When face verification is required, Continue opens the camera and the API compares the selfie against the employee's profile-photo reference. A missing valid reference blocks attendance. When disabled, attendance can submit without a profile photo or selfie.
 
-- `ApiClient` attaches the stored access token as a bearer header and converts
-  failures into `ApiFailure`, which reads the API's
-  `{"error": {"code", "message", "details"}}` envelope.
-- Tokens are stored only in `flutter_secure_storage` (Keychain / Android
-  Keystore-backed storage). A partial token pair is discarded.
-- `AuthCubit` restores the session before the first frame. The `go_router`
-  redirect sends unauthenticated users to `/login` and authenticated users away
-  from it.
+Outside-location behavior follows the company policy: `BLOCK`, `ALLOW_WITH_APPROVAL` (required note and pending approval), or `ALLOW` (recorded anomaly). The server validates location, face, clock windows, and duplicate attempts.
 
-## Authentication (Phase 1A)
+Clock In is disabled after a recorded entry; Clock Out remains available under the existing clock rules. After a recorded exit, both are disabled for that record. Pending approval is not shown as completed attendance and does not contribute to payroll.
 
-| Concern            | Location                                              |
-| ------------------ | ----------------------------------------------------- |
-| API calls          | `lib/features/auth/data/auth_repository.dart`         |
-| Contract models    | `lib/features/auth/domain/auth_models.dart`           |
-| Session state      | `lib/features/auth/application/auth_cubit.dart`       |
-| Sign-in form state | `lib/features/auth/application/login_cubit.dart`      |
-| Device identity    | `lib/core/storage/device_identity.dart`               |
-| Token refresh      | `_SessionRefreshInterceptor` in `api_client.dart`     |
+## Visual system and navigation
 
-- **Sign-in:** `POST /auth/login` with email, password, and the device. The
-  device is a random installation UUID kept in secure storage, sent with
-  platform `ANDROID`/`IOS`.
-- **Errors:** the API error code is mapped to a message, for example wrong
-  credentials, deactivated account, rate limit, or offline.
-- **Refresh:** a 401 on any request triggers one `POST /auth/refresh`, then
-  the request is retried.
-  - 401 responses are queued, so concurrent failures share one refresh. This
-    matters because refresh tokens are single-use and reuse ends the session.
-  - The refresh and the retry use an interceptor-free client, so a failing
-    retry cannot deadlock the queue.
-- **Session expiry:** if the API rejects the refresh token, stored tokens are
-  cleared and `ApiClient.sessionExpired` fires. The app then returns to sign-in
-  with "Your session has ended".
-- **Restore:** the app opens straight to Home when tokens are stored, even
-  offline, and loads `/auth/me` in the background.
-- **Sign-out:** sign out of this device (`/auth/logout`, best effort), or sign
-  out of all devices (`/auth/logout-all`). Signing out of all devices fails
-  visibly when offline.
-- **Push delivery:** Firebase Cloud Messaging requests notification permission
-  after authentication, registers the current device token with the API, and
-  removes it before sign-out. Token rotation is registered automatically.
-  FCM contains navigation metadata only; the persisted Inbox notification
-  remains authoritative.
-- **Navigation:** Home, Employees, Request, Inbox, and Account are the main
-  tabs. Live Attendance and the manager approval list open from focused actions.
-- **Not yet:** forgot or reset password (needs email delivery on the API).
-  The login screen points users to HR.
+The main tabs are Home, Employees, Request, Inbox, and Account. Requests uses a bottom-right floating plus button that opens the request-category sheet.
 
-Revoking sessions on the server (logout-all) takes effect at the next token
-refresh, up to the access-token lifetime (15 minutes by default).
-Deactivating an account takes effect on the next request.
+The original Knect violet palette follows system light/dark mode through `AppTheme`. Home quick actions and Account rows use original local SVG icons with contrasting theme colors and neutral containers. Employee avatars show profile pictures, falling back to initials for missing/failed images. See [visual system](docs/MOBILE_VISUAL_SYSTEM.md) and [flow guide](docs/FLOW.md).
 
-## Checks
+## Verification and build notes
 
 ```bash
-dart format lib test
 flutter analyze
-flutter test
-flutter build apk --debug
+flutter test test/mobile_visual_system_test.dart test/employee_photo_test.dart
+flutter build apk --debug --dart-define-from-file=env/development.json
 ```
 
-> **tflite_flutter build compatibility:** `tflite_flutter` 0.11.0 targets an
-> older Android toolchain (Java 1.8, compile SDK 31) than this project (AGP 9,
-> Kotlin 2.x, JDK 21). `android/build.gradle.kts` realigns library subprojects
-> to Java 17 and raises the `tflite_flutter` module's compile SDK to the app's
-> via `finalizeDsl`, and `gradle.properties` relaxes Kotlin JVM-target
-> validation and opts out of unique package names for the shared TensorFlow Lite
-> artifacts. With these in place `flutter build apk` succeeds. Remove the
-> workarounds once `tflite_flutter` ships an AGP‑9‑compatible release.
+The targeted tests cover priority-screen navigation, request creation, narrow widths/enlarged text, attendance permission/camera error states, profile rendering, and clock-button availability. They do not replace physical-device GPS/camera acceptance. `flutter test` runs the full suite when explicitly needed.
 
-## Current features
+Android currently retains TensorFlow Lite namespace/JVM/toolchain compatibility settings in `android/gradle.properties` and `android/build.gradle.kts`. Camera/Firebase Kotlin plugin warnings are separate from a fatal manifest-merger error. Review these settings when upgrading Flutter/Gradle/plugins.
 
-- Login with JWT access + refresh token
-- Today status, attendance, GPS checks, selfie evidence, and attendance history
-- Leave, overtime, and attendance-correction requests
-- Manager approval inbox, in-app notifications, and FCM delivery
-- Employee directory and self profile
+Firebase delivery needs the platform Firebase configuration and server credentials; iOS also needs APNs configuration. Inbox persistence remains the source of truth when push is unavailable.
 
-## Planned features
-
-- Payslip
-- KPI / performance
-
-## Architecture direction
-
-Feature-first folders inspired by mature Flutter HR apps. API state and secure token storage stay isolated in core services.
-
-## Brand
-
-The app is branded **Knect** (ADR-016). The name, palette, and asset paths
-live in `lib/core/brand/brand.dart`. Source artwork is in `design/brand/`.
-Launcher icons were generated from it:
-
-- Android: legacy and adaptive (`mipmap-anydpi-v26`).
-- iOS: opaque `AppIcon` set.
-
-Regenerate the icons whenever the artwork changes.
+Start with the [documentation index](docs/README.md), [current status](docs/STATUS.md), and [decisions](docs/05_DECISIONS.md).
