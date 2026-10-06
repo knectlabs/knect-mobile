@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../shared/widgets/large_title.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../../shared/widgets/navigation.dart';
 import '../../approvals/presentation/approvals_screen.dart';
 import '../../auth/application/auth_cubit.dart';
@@ -48,13 +49,16 @@ class InboxScreen extends StatelessWidget {
                   icon: const Icon(Icons.history),
                 ),
               ),
-              TabBar(
-                labelStyle: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600),
-                tabs: const [
-                  Tab(text: 'Notifications'),
-                  Tab(text: 'Need My Approval'),
-                ],
+              ColoredBox(
+                color: KnectColors.surface,
+                child: TabBar(
+                  labelStyle: theme.textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                  tabs: const [
+                    Tab(text: 'Notifications'),
+                    Tab(text: 'Need My Approval'),
+                  ],
+                ),
               ),
               const Expanded(
                 child: TabBarView(

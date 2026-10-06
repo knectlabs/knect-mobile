@@ -222,3 +222,8 @@ Brand palette (from the app icon and wordmark):
 
 The mobile app is rebranded. The admin web still uses the former green
 identity until the admin phase.
+
+
+## Mobile visual refinement (2026-10-06)
+
+The user-approved white/lilac mobile palette and fixed light theme supersede the dark mobile surface treatment in ADR-016. Brand name and assets stay Knect. See MOBILE_VISUAL_SYSTEM.md for tokens, screen scope and accessibility decisions.

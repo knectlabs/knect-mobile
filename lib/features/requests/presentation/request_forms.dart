@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/async/async_value.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/time/format.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../auth/application/auth_cubit.dart';
 import '../application/requests_cubit.dart';
@@ -84,12 +85,21 @@ class _RequestFormState extends State<_RequestForm> {
       body: AbsorbPointer(
         absorbing: _busy,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          padding: const EdgeInsets.fromLTRB(KnectSpacing.xl, KnectSpacing.sm,
+              KnectSpacing.xl, KnectSpacing.xxl),
           children: [
-            for (final field in widget.fields) ...[
-              field,
-              const SizedBox(height: 14)
-            ],
+            Card(
+                margin: EdgeInsets.zero,
+                child: Padding(
+                    padding: KnectSpacing.page,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (final field in widget.fields) ...[
+                            field,
+                            const SizedBox(height: KnectSpacing.lg)
+                          ],
+                        ]))),
             if (_error != null)
               Container(
                 padding: const EdgeInsets.all(14),

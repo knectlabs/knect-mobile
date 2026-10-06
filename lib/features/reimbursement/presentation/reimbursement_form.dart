@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/async/async_value.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/time/format.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../auth/application/auth_cubit.dart';
 import '../application/reimbursements_cubit.dart';
 import '../data/reimbursement_repository.dart';
@@ -141,85 +142,99 @@ class _ReimbursementFormScreenState extends State<ReimbursementFormScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
-            DropdownButtonFormField<String>(
-              key: const Key('reimbursement.category'),
-              initialValue: _category,
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                prefixIcon: Icon(Icons.category_outlined),
-              ),
-              items: [
-                for (final category in _categories)
-                  DropdownMenuItem(
-                    value: category,
-                    child: Text(reimbursementCategoryLabel(category)),
-                  ),
-              ],
-              onChanged: (value) => setState(() => _category = value),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              key: const Key('reimbursement.amount'),
-              controller: _amount,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixIcon: Icon(Icons.payments_outlined),
-                prefixText: 'Rp ',
-              ),
-            ),
-            const SizedBox(height: 14),
-            InkWell(
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: _date!,
-                  firstDate: today.subtract(const Duration(days: 365)),
-                  lastDate: today,
-                );
-                if (picked != null) setState(() => _date = picked);
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Expense date',
-                  prefixIcon: Icon(Icons.event_outlined),
-                ),
-                child: Text(Clock.date(_date!)),
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              key: const Key('reimbursement.description'),
-              controller: _description,
-              minLines: 3,
-              maxLines: 6,
-              maxLength: 1000,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                alignLabelWithHint: true,
-              ),
-            ),
-            const SizedBox(height: 4),
-            OutlinedButton.icon(
-              key: const Key('reimbursement.receipt'),
-              onPressed: _uploading ? null : _pickReceipt,
-              icon: _uploading
-                  ? const SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Icon(_receiptUrl == null
-                      ? Icons.attach_file
-                      : Icons.check_circle_outline),
-              label: Text(_uploading
-                  ? 'Uploading…'
-                  : _receiptUrl == null
-                      ? 'Attach receipt (optional)'
-                      : 'Receipt attached'),
-            ),
+            Card(
+                margin: EdgeInsets.zero,
+                child: Padding(
+                    padding: KnectSpacing.page,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          DropdownButtonFormField<String>(
+                            key: const Key('reimbursement.category'),
+                            initialValue: _category,
+                            decoration: const InputDecoration(
+                              labelText: 'Category',
+                              prefixIcon: Icon(Icons.category_outlined),
+                            ),
+                            items: [
+                              for (final category in _categories)
+                                DropdownMenuItem(
+                                  value: category,
+                                  child: Text(
+                                      reimbursementCategoryLabel(category)),
+                                ),
+                            ],
+                            onChanged: (value) =>
+                                setState(() => _category = value),
+                          ),
+                          const SizedBox(height: 14),
+                          TextField(
+                            key: const Key('reimbursement.amount'),
+                            controller: _amount,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            decoration: const InputDecoration(
+                              labelText: 'Amount',
+                              prefixIcon: Icon(Icons.payments_outlined),
+                              prefixText: 'Rp ',
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          InkWell(
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: _date!,
+                                firstDate:
+                                    today.subtract(const Duration(days: 365)),
+                                lastDate: today,
+                              );
+                              if (picked != null) {
+                                setState(() => _date = picked);
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: InputDecorator(
+                              decoration: const InputDecoration(
+                                labelText: 'Expense date',
+                                prefixIcon: Icon(Icons.event_outlined),
+                              ),
+                              child: Text(Clock.date(_date!)),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          TextField(
+                            key: const Key('reimbursement.description'),
+                            controller: _description,
+                            minLines: 3,
+                            maxLines: 6,
+                            maxLength: 1000,
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: const InputDecoration(
+                              labelText: 'Description',
+                              alignLabelWithHint: true,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          OutlinedButton.icon(
+                            key: const Key('reimbursement.receipt'),
+                            onPressed: _uploading ? null : _pickReceipt,
+                            icon: _uploading
+                                ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  )
+                                : Icon(_receiptUrl == null
+                                    ? Icons.attach_file
+                                    : Icons.check_circle_outline),
+                            label: Text(_uploading
+                                ? 'Uploading…'
+                                : _receiptUrl == null
+                                    ? 'Attach receipt (optional)'
+                                    : 'Receipt attached'),
+                          ),
+                        ]))),
             if (_error != null) ...[
               const SizedBox(height: 14),
               Container(

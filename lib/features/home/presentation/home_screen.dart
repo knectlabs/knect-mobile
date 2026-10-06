@@ -5,10 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/async/async_value.dart';
-import '../../../core/brand/brand.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/time/format.dart';
 import '../../../shared/widgets/initials_avatar.dart';
+import '../../../shared/widgets/profile_photo_avatar.dart';
 import '../../../shared/widgets/navigation.dart';
 import '../../announcements/application/announcements_cubit.dart';
 import '../../announcements/data/announcements_repository.dart';
@@ -99,7 +100,10 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        InitialsAvatar(name: name, radius: 22),
+                        ProfilePhotoAvatar(
+                            name: name,
+                            photoUrl: profile?.profilePhotoUrl,
+                            radius: 22),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -165,9 +169,7 @@ class _ShiftCard extends StatelessWidget {
     final colors = theme.colorScheme;
     final state = context.watch<TodayCubit>().state;
     final today = state.valueOrPrevious;
-    final tint = BrandColors.primaryViolet.withValues(
-      alpha: theme.brightness == Brightness.dark ? 0.16 : 0.08,
-    );
+    const tint = KnectColors.surface;
 
     Widget body;
     var title = 'Shift schedule';
@@ -279,20 +281,19 @@ class _ShiftCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: BrandColors.primaryViolet.withValues(alpha: 0.35)),
+        border: Border.all(color: KnectColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            color: BrandColors.secondaryViolet,
+            color: KnectColors.lilacSurface,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Text(
               title,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
-                color: Colors.white,
+                color: KnectColors.strongPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -337,11 +338,13 @@ class _ClockButtons extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Opacity(
               opacity: enabled ? 1 : 0.4,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: KnectSpacing.sm,
+                runSpacing: KnectSpacing.xs,
                 children: [
                   Icon(icon, color: color),
-                  const SizedBox(width: 10),
                   Text(
                     label,
                     style: theme.textTheme.titleMedium
@@ -366,7 +369,7 @@ class _ClockButtons extends StatelessWidget {
         child: Row(
           children: [
             half(ClockAction.clockIn, Icons.login_rounded, 'Clock In',
-                BrandColors.secondaryViolet),
+                KnectColors.strongPrimary),
             VerticalDivider(
                 width: 1,
                 indent: 10,
@@ -394,7 +397,8 @@ class _App {
 /// A single shortcut cell: a soft-lilac rounded container with a lilac icon and
 /// a label. Uniform treatment — no per-shortcut colours.
 class _AppTile extends StatelessWidget {
-  const _AppTile({required this.icon, required this.label, required this.onTap});
+  const _AppTile(
+      {required this.icon, required this.label, required this.onTap});
 
   final IconData icon;
   final String label;
@@ -403,7 +407,6 @@ class _AppTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dark = theme.brightness == Brightness.dark;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: onTap,
@@ -414,12 +417,10 @@ class _AppTile extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: dark
-                  ? BrandColors.primaryViolet.withValues(alpha: 0.18)
-                  : BrandColors.offWhite,
+              color: KnectColors.lilacSurface,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: BrandColors.primaryViolet, size: 24),
+            child: Icon(icon, color: KnectColors.strongPrimary, size: 24),
           ),
           const SizedBox(height: 8),
           Text(
@@ -450,12 +451,16 @@ class _AppGrid extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: GridView.count(
-        crossAxisCount: 4,
+        crossAxisCount: MediaQuery.sizeOf(context).width < 360 ||
+                MediaQuery.textScalerOf(context).scale(14) > 18
+            ? 3
+            : 4,
         shrinkWrap: true,
         // Explicit padding; otherwise the grid inherits the status-bar inset.
         padding: const EdgeInsets.symmetric(vertical: 8),
         physics: const NeverScrollableScrollPhysics(),
-        childAspectRatio: 0.9,
+        childAspectRatio:
+            MediaQuery.textScalerOf(context).scale(14) > 18 ? 0.72 : 0.9,
         children: [
           for (final app in visible)
             KeyedSubtree(
@@ -506,7 +511,10 @@ class _AppGrid extends StatelessWidget {
                   crossAxisCount: 4,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 0.9,
+                  childAspectRatio:
+                      MediaQuery.textScalerOf(context).scale(14) > 18
+                          ? 0.72
+                          : 0.9,
                   children: [
                     for (final app in apps)
                       KeyedSubtree(

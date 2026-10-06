@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/knect_tokens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/time/format.dart';
@@ -91,9 +92,18 @@ class _AnnouncementBody extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       children: [
+        Align(
+            alignment: Alignment.centerLeft,
+            child: Chip(
+                avatar: const Icon(Icons.campaign_outlined,
+                    size: 18, color: KnectColors.strongPrimary),
+                label: Text(announcement.status == 'PUBLISHED'
+                    ? 'Company announcement'
+                    : 'Draft'))),
+        const SizedBox(height: KnectSpacing.md),
         Text(
           announcement.title,
-          style: theme.textTheme.headlineSmall
+          style: theme.textTheme.headlineMedium
               ?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 14),
@@ -122,10 +132,12 @@ class _AnnouncementBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        Text(
-          announcement.body,
-          style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
-        ),
+        Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+                padding: KnectSpacing.page,
+                child: SelectableText(announcement.body,
+                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.65)))),
       ],
     );
   }

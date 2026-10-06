@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/brand/brand.dart';
+import '../../core/theme/knect_tokens.dart';
 
 /// Circle with up to two initials, for people without a photo.
 class InitialsAvatar extends StatelessWidget {
@@ -31,14 +31,14 @@ class InitialsAvatar extends StatelessWidget {
       height: radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: BrandColors.brandGradient,
+        color: KnectColors.lilacSurface,
         border: onBrand ? Border.all(color: Colors.white, width: 2) : null,
       ),
       alignment: Alignment.center,
       child: Text(
         initialsOf(name),
         style: TextStyle(
-          color: Colors.white,
+          color: KnectColors.strongPrimary,
           fontWeight: FontWeight.w700,
           fontSize: radius * 0.7,
         ),

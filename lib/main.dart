@@ -152,9 +152,8 @@ class _KnectAppState extends State<KnectApp> {
           child: MaterialApp.router(
             title: Brand.name,
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            themeMode: ThemeMode.system,
+            theme: KnectTheme.light,
+            themeMode: ThemeMode.light,
             routerConfig: _appRouter.router,
             builder: (context, child) => _SessionScope(child: child!),
           ),

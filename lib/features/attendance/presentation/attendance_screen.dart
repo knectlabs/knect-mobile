@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/async/async_value.dart';
-import '../../../core/brand/brand.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../../core/geo/distance.dart';
 import '../../../core/time/format.dart';
 import '../../../shared/widgets/navigation.dart';
@@ -31,7 +31,7 @@ class AttendanceScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         body: RefreshIndicator(
           onRefresh: context.read<TodayCubit>().load,
@@ -43,8 +43,8 @@ class AttendanceScreen extends StatelessWidget {
                   // Header extends behind the top of the schedule card.
                   Container(
                     height: 290 + MediaQuery.paddingOf(context).top,
-                    decoration: const BoxDecoration(
-                        gradient: BrandColors.brandGradient),
+                    decoration:
+                        const BoxDecoration(color: KnectColors.lilacSurface),
                   ),
                   SafeArea(
                     bottom: false,
@@ -56,7 +56,8 @@ class AttendanceScreen extends StatelessWidget {
                             SizedBox(
                               width: 56,
                               child: Navigator.canPop(context)
-                                  ? const BackButton(color: Colors.white)
+                                  ? const BackButton(
+                                      color: KnectColors.textPrimary)
                                   : null,
                             ),
                             Expanded(
@@ -64,7 +65,7 @@ class AttendanceScreen extends StatelessWidget {
                                 'Live Attendance',
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.titleMedium?.copyWith(
-                                  color: Colors.white,
+                                  color: KnectColors.textPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -148,7 +149,7 @@ class _LiveClockState extends State<_LiveClock> {
         Text(
           Clock.hm(_now, widget.timezone),
           style: theme.textTheme.displayMedium?.copyWith(
-            color: Colors.white,
+            color: KnectColors.textPrimary,
             fontWeight: FontWeight.w700,
             fontFeatures: const [ui.FontFeature.tabularFigures()],
           ),
@@ -157,7 +158,7 @@ class _LiveClockState extends State<_LiveClock> {
         Text(
           Clock.date(local),
           style: theme.textTheme.titleMedium?.copyWith(
-            color: Colors.white.withValues(alpha: 0.85),
+            color: KnectColors.textPrimary.withValues(alpha: 0.85),
           ),
         ),
       ],

@@ -10,7 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 
 import '../../../core/async/async_value.dart';
-import '../../../core/brand/brand.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../../core/geo/distance.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
@@ -38,7 +38,7 @@ String _verb(ClockAction action) =>
 
 /* Shared chrome */
 
-const _headerColor = BrandColors.darkPurple;
+const _headerColor = KnectColors.lilacSurface;
 
 PreferredSizeWidget _stepAppBar(
   ClockAction action,
@@ -47,8 +47,8 @@ PreferredSizeWidget _stepAppBar(
 }) {
   return AppBar(
     backgroundColor: _headerColor,
-    foregroundColor: Colors.white,
-    systemOverlayStyle: SystemUiOverlayStyle.light,
+    foregroundColor: KnectColors.textPrimary,
+    systemOverlayStyle: SystemUiOverlayStyle.dark,
     centerTitle: true,
     title: Column(
       children: [
@@ -58,8 +58,7 @@ PreferredSizeWidget _stepAppBar(
         ),
         Text(
           'Step $step of 2',
-          style: TextStyle(
-              fontSize: 12, color: Colors.white.withValues(alpha: 0.75)),
+          style: TextStyle(fontSize: 12, color: KnectColors.mutedText),
         ),
       ],
     ),
@@ -111,13 +110,14 @@ class _ScheduleBand extends StatelessWidget {
                   Icon(Icons.calendar_today_outlined,
                       size: 16, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(width: 8),
-                  Text(
+                  Expanded(
+                      child: Text(
                     '${Clock.shortDate(schedule.date)} ${schedule.date.substring(0, 4)}$times',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       fontFeatures: const [ui.FontFeature.tabularFigures()],
                     ),
-                  ),
+                  )),
                 ],
               ),
             ],
@@ -447,8 +447,8 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
               point: officePoint,
               radius: office!.radiusMeters,
               useRadiusInMeter: true,
-              color: BrandColors.primaryViolet.withValues(alpha: 0.14),
-              borderColor: BrandColors.primaryViolet,
+              color: KnectColors.primary.withValues(alpha: 0.14),
+              borderColor: KnectColors.primary,
               borderStrokeWidth: 1.5,
             ),
           ]),
@@ -460,7 +460,7 @@ class _ClockLocationScreenState extends State<ClockLocationScreen> {
               height: 36,
               alignment: Alignment.topCenter,
               child: const Icon(Icons.location_on,
-                  size: 36, color: BrandColors.deepViolet),
+                  size: 36, color: KnectColors.strongPrimary),
             ),
           if (userPoint != null)
             Marker(
@@ -487,7 +487,7 @@ class _Avatar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: BrandColors.brandGradient,
+        color: KnectColors.lilacSurface,
         border: Border.all(color: Colors.white, width: 3),
         boxShadow: const [
           BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
@@ -496,8 +496,8 @@ class _Avatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initials,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        style: const TextStyle(
+            color: KnectColors.strongPrimary, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -624,7 +624,7 @@ class _LocationSummary extends StatelessWidget {
                   color: distance == null
                       ? theme.colorScheme.primary
                       : inside
-                          ? const Color(0xFF1F8A5B)
+                          ? KnectColors.success
                           : theme.colorScheme.error,
                 ),
                 const SizedBox(width: 10),
@@ -1018,7 +1018,7 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
     if (camera != null && camera.value.isInitialized) {
       final size = camera.value.previewSize;
       return ColoredBox(
-        color: Colors.black,
+        color: KnectColors.cameraBackdrop,
         child: ClipRect(
           child: FittedBox(
             fit: BoxFit.cover,
@@ -1034,22 +1034,22 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
     }
     final error = _cameraError;
     return ColoredBox(
-      color: const Color(0xFF2A2638),
+      color: KnectColors.background,
       child: Center(
         child: error == null
-            ? const CircularProgressIndicator(color: Colors.white)
+            ? const CircularProgressIndicator(color: KnectColors.textPrimary)
             : Padding(
                 padding: const EdgeInsets.all(32),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.no_photography_outlined,
-                        color: Colors.white, size: 40),
+                        color: KnectColors.textPrimary, size: 40),
                     const SizedBox(height: 12),
                     Text(
                       error,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: KnectColors.textPrimary),
                     ),
                     const SizedBox(height: 12),
                     Wrap(
@@ -1057,15 +1057,15 @@ class _ClockSelfieScreenState extends State<ClockSelfieScreen>
                       children: [
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: const BorderSide(color: Colors.white54),
+                            foregroundColor: KnectColors.textPrimary,
+                            side: const BorderSide(color: KnectColors.lilac),
                           ),
                           onPressed: _startCamera,
                           child: const Text('Try again'),
                         ),
                         TextButton(
                           style: TextButton.styleFrom(
-                              foregroundColor: Colors.white),
+                              foregroundColor: KnectColors.textPrimary),
                           onPressed: Geolocator.openAppSettings,
                           child: const Text('App settings'),
                         ),

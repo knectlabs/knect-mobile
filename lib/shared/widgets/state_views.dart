@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/async/async_value.dart';
+import '../../core/theme/knect_tokens.dart';
 
 /// Renders an [AsyncValue]: skeleton while first loading, error with retry,
 /// otherwise [builder] (also during refresh, using the previous value).
@@ -82,32 +83,38 @@ class EmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: theme.colorScheme.primaryContainer,
-            child: Icon(icon, color: theme.colorScheme.onPrimaryContainer),
-          ),
-          const SizedBox(height: 14),
-          Text(title,
-              style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
-          if (message != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              message!,
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.all(KnectSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+          horizontal: KnectSpacing.xxl, vertical: KnectSpacing.section),
+      decoration: BoxDecoration(
+          color: KnectColors.surface,
+          borderRadius: BorderRadius.circular(KnectRadius.card),
+          border: Border.all(color: KnectColors.border)),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+                color: KnectColors.lilacSurface,
+                borderRadius: BorderRadius.circular(KnectRadius.sheet)),
+            child: Icon(icon, size: 36, color: KnectColors.strongPrimary)),
+        const SizedBox(height: KnectSpacing.xxl),
+        Text(title,
+            style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+        if (message != null) ...[
+          const SizedBox(height: KnectSpacing.sm),
+          Text(message!,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-          if (action != null) ...[const SizedBox(height: 16), action!],
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: KnectColors.textSecondary)),
         ],
-      ),
+        if (action != null) ...[
+          const SizedBox(height: KnectSpacing.xxl),
+          action!
+        ],
+      ]),
     );
   }
 }
@@ -162,24 +169,13 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
     final (background, foreground) = switch (tone) {
-      StatusTone.success => (
-          const Color(0xFF1F8A5B).withValues(alpha: dark ? 0.25 : 0.12),
-          dark ? const Color(0xFF7FD8AE) : const Color(0xFF13643F),
-        ),
-      StatusTone.warning => (
-          const Color(0xFFC98A0B).withValues(alpha: dark ? 0.25 : 0.14),
-          dark ? const Color(0xFFF2C66D) : const Color(0xFF7A5205),
-        ),
-      StatusTone.danger => (
-          colors.error.withValues(alpha: dark ? 0.2 : 0.12),
-          dark ? colors.error : colors.onErrorContainer,
-        ),
+      StatusTone.success => (KnectColors.successSurface, KnectColors.success),
+      StatusTone.warning => (KnectColors.warningSurface, KnectColors.warning),
+      StatusTone.danger => (KnectColors.dangerSurface, KnectColors.danger),
       StatusTone.neutral => (
-          colors.surfaceContainerHighest,
-          colors.onSurfaceVariant
+          KnectColors.lilacSurface,
+          KnectColors.textSecondary
         ),
     };
     return Container(

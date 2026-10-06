@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/async/async_value.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/time/format.dart';
+import '../../../core/theme/knect_tokens.dart';
 import '../../../shared/widgets/navigation.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../approvals/presentation/approvals_screen.dart';
@@ -39,7 +40,41 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }
 
   Future<void> _new() async {
-    final page = switch (_kind) {
+    final selected = await showModalBottomSheet<_Kind>(
+      context: context,
+      useSafeArea: true,
+      builder: (sheetContext) => SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: KnectSpacing.lg),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                      padding: KnectSpacing.page,
+                      child: Text('New request',
+                          style: Theme.of(sheetContext).textTheme.titleLarge)),
+                  for (final item in const [
+                    (_Kind.leave, Icons.beach_access_outlined, 'Leave'),
+                    (_Kind.overtime, Icons.more_time_outlined, 'Overtime'),
+                    (
+                      _Kind.correction,
+                      Icons.edit_calendar_outlined,
+                      'Attendance correction'
+                    )
+                  ])
+                    ListTile(
+                        leading: Icon(item.$2),
+                        title: Text(item.$3),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.pop(sheetContext, item.$1)),
+                ]),
+          )),
+    );
+    if (selected == null || !mounted) return;
+    setState(() => _kind = selected);
+    final page = switch (selected) {
       _Kind.leave => const LeaveFormScreen(),
       _Kind.overtime => const OvertimeFormScreen(),
       _Kind.correction => const CorrectionFormScreen(),
@@ -55,20 +90,22 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Requests')),
-      floatingActionButton: FloatingActionButton.extended(
-        key: const Key('requests.new'),
-        onPressed: _new,
-        icon: const Icon(Icons.add),
-        label: Text(switch (_kind) {
-          _Kind.leave => 'Request leave',
-          _Kind.overtime => 'Request overtime',
-          _Kind.correction => 'New correction',
-        }),
-      ),
+      bottomNavigationBar: Material(
+          color: KnectColors.surface,
+          child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.fromLTRB(KnectSpacing.xl,
+                  KnectSpacing.md, KnectSpacing.xl, KnectSpacing.lg),
+              child: FilledButton.icon(
+                  key: const Key('requests.new'),
+                  onPressed: _new,
+                  icon: const Icon(Icons.add),
+                  label: const Text('New request')))),
       body: RefreshIndicator(
         onRefresh: context.read<RequestsCubit>().load,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+          padding: const EdgeInsets.fromLTRB(KnectSpacing.xl, KnectSpacing.sm,
+              KnectSpacing.xl, KnectSpacing.xxl),
           children: [
             if (canApprove(role)) ...[
               Card(
@@ -203,7 +240,7 @@ class _Balances extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      height: 96,
+      height: 108 * MediaQuery.textScalerOf(context).scale(14) / 14,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: balances.length,
@@ -214,7 +251,7 @@ class _Balances extends StatelessWidget {
             width: 160,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.55),
+              color: KnectColors.lilacSurface,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
