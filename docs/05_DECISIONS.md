@@ -237,3 +237,8 @@ At the user's request, the original violet palette and system light/dark mode ar
 ### 2026-10-06: employee photos and attendance action icons
 
 Directory responses include the existing profilePhotoUrl for colleagues within the authenticated organization. Mobile uses profile photos in employee lists, leave summaries, direct reports, and team activity, with initials as a missing/failed-image fallback. Protected images use the configured API host; public HTTPS images use a separate client without session credentials. Clock In/Out share original SVG assets and theme-aware controls; narrow layouts stack actions, and existing attendance eligibility remains authoritative. No database migration.
+
+
+### 2026-10-06: Home shortcuts and Account menu icons
+
+Home quick actions (including All Apps) and Account menu rows use original local SVG line icons through KnectFeatureIcon. Icons use the theme onSurface color on a neutral surfaceContainerHigh background instead of purple-on-purple and individual Account colors. Existing labels, destinations, profile-photo rendering, and attendance policy/flow are preserved. Verified with Flutter analyze and targeted screen widget checks at 320/390 px and enlarged text, plus rendered Home and Account screenshots.

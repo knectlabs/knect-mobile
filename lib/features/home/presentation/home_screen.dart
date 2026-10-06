@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/clock_action_buttons.dart';
+import '../../../shared/widgets/knect_feature_icon.dart';
 import '../../../core/async/async_value.dart';
 import '../../../core/brand/brand.dart';
 import '../../../core/routing/app_router.dart';
@@ -367,11 +368,10 @@ class _AppTile extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: theme.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon,
-                color: theme.colorScheme.onPrimaryContainer, size: 24),
+            child: KnectFeatureIcon(icon: icon, size: 28),
           ),
           const SizedBox(height: 8),
           Text(
